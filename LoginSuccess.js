@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Image, Linking } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
 
-export default class SignupSuccess extends Component {
+export default class LoginSuccess extends Component {
     constructor(props) {
         super(props);
     }
@@ -22,19 +22,10 @@ export default class SignupSuccess extends Component {
 
                     <View>
                         <Text>
-                            We have just sent you a confirmation email. Please check your inbox. If you did not receive
-                            our confirmation email, please let us know by emailing thumb support -
-                            <Text style={{color: 'blue'}}>
-                                support@thumbtravel.com
-                            </Text>
+                            You are logged in successfully.
                         </Text>
                     </View>
 
-                    <Button rounded success onPress={() => this.props.navigation.navigate('LoginScreen')} >
-                        <Text>
-                            LOG IN
-                        </Text>
-                    </Button>
                 </Content>
             </Container>
         );

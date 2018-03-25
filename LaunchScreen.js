@@ -15,7 +15,7 @@ export default class LaunchScreen extends Component {
                             Welcome to thumb
                         </Text>
                     </View>
-                    <Button rounded success>
+                    <Button rounded success onPress={() => this.props.navigation.navigate('LoginScreen')}>
                         <Text>
                             LOG IN
                         </Text>

@@ -7,6 +7,8 @@ import SignupStep2 from './SignupStep2';
 import SignupStep3 from './SignupStep3';
 import SignupStep4 from './SignupStep4';
 import SignupSuccess from './SignupSuccess';
+import LoginScreen from './LoginScreen';
+import LoginSuccess from './LoginSuccess';
 
 export const SignedOutStack = StackNavigator({
     LaunchScreen: {
@@ -43,6 +45,18 @@ export const SignedOutStack = StackNavigator({
         screen: SignupSuccess,
         navigationOptions: {
             title: 'Sign up successful'
+        }
+    },
+    LoginScreen: {
+        screen: LoginScreen,
+        navigationOptions: {
+            title: 'Log in'
+        }
+    },
+    LoginSuccess: {
+        screen: LoginSuccess,
+        navigationOptions: {
+            title: 'Log in successful'
         }
     }
 });
