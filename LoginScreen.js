@@ -64,7 +64,15 @@ export default class LoginScreen extends Component {
                         "Feel free to email us at support@thumbtravel.com if you face any issues."
                 })
             }
-            else this.props.navigation.navigate('LoginSuccess');
+            else if(responseStatus == 200) {
+                this.props.navigation.navigate('LoginSuccess');
+            }
+            else {
+                this.setState({
+                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    "please let us know at support@thumbtravel.com"
+                })
+            }
         })
         .catch( error => {
             // TODO log error

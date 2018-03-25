@@ -3,7 +3,7 @@ import { Container, Content, View, Text, Button, Input } from 'native-base';
 import Config from 'react-native-config';
 
 const initialState = {
-    firstName: '', lastName: '', username: '', error: '', error2: ''
+    firstName: '', lastName: '', username: '', clientError: '', serverError: ''
 };
 
 export default class SignupStep1 extends Component {
@@ -14,50 +14,71 @@ export default class SignupStep1 extends Component {
 
     canGoNext() {
         if(this.state.firstName.length < 1 || this.state.firstName.length > 30) {
-            this.state.error = "First Name should be between 1 to 30 characters";
+            this.state.clientError = "First Name should be between 1 to 30 characters";
             return false;
         }
 
         if(this.state.lastName.length < 1 || this.state.lastName.length > 30) {
-            this.state.error = "Last Name should be between 1 to 30 characters";
+            this.state.clientError = "Last Name should be between 1 to 30 characters";
             return false;
         }
 
         let regex = /^[a-z0-9._]{3,30}$/;
         if (!regex.test(this.state.username)) {
-            this.state.error = "Username should be between 3 to 30 characters and can only contain numbers, letters, periods and underscores";
+            this.state.clientError = "Username should be between 3 to 30 characters and can only contain numbers, letters, periods and underscores";
             return false;
         }
 
-        this.state.error = "";
+        this.state.clientError = "";
         return true;
     }
 
     checkUsername() {
+        let responseStatus = 0;
         fetch(Config.API_URL+'/user/validate/username/' + this.state.username, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-        .then(this.handleErrors)
         .then( response => {
-            this.props.navigation.navigate('SignupStep2', {
-                user: {
-                    firstName: this.state.firstName,
-                    lastName: this.state.lastName,
-                    username: this.state.username
-                }
-            });
+            responseStatus = response.status
+            return response.json()
         })
-        .catch( () => { this.setState({ error2: "Duplicate Username" }) })
-    }
-
-    handleErrors(response) {
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        return response;
+        .then( response => {
+            if(responseStatus == 422) {
+                this.setState({
+                    serverError: "Invalid username"
+                })
+            }
+            else if(responseStatus == 409) {
+                this.setState({
+                    serverError: "Duplicate username"
+                })
+            }
+            else if(responseStatus == 200) {
+                this.props.navigation.navigate('SignupStep2', {
+                    user: {
+                        firstName: this.state.firstName,
+                        lastName: this.state.lastName,
+                        username: this.state.username
+                    }
+                });
+            }
+            else {
+                this.setState({
+                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    "please let us know at support@thumbtravel.com"
+                })
+            }
+        })
+        .catch( error => {
+            // TOOD log error
+            this.setState({
+                serverError: "Some error occured. Please try again. If problem persists, " + 
+                "please let us know at support@thumbtravel.com"
+            })
+        })
     }
 
     render() {
@@ -94,7 +115,7 @@ export default class SignupStep1 extends Component {
                         onChangeText={(username) => {
                             this.setState({
                                 username: username.toLowerCase(),
-                                error2: ''
+                                serverError: ''
                             })
                         }}
                         value={this.state.username.toLowerCase()}
@@ -109,13 +130,13 @@ export default class SignupStep1 extends Component {
 
                     <View>
                         <Text>
-                            { this.state.error }
+                            { this.state.clientError }
                         </Text>
                     </View>
 
                     <View>
                         <Text>
-                            { this.state.error2 }
+                            { this.state.serverError }
                         </Text>
                     </View>
 

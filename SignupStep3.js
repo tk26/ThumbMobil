@@ -5,7 +5,7 @@ import DatePicker from 'react-native-datepicker';
 import moment from 'moment';
 
 const initialState = {
-    email: '', university: 'none', birthday: '', error: '', error2: ''
+    email: '', university: 'none', birthday: '', clientError: '', serverError: ''
 };
 
 export default class SignupStep3 extends Component {
@@ -23,61 +23,79 @@ export default class SignupStep3 extends Component {
     canGoNext() {
         let reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if(!reg.test(this.state.email)) {
-            this.state.error = "Incorrect email address";
+            this.state.clientError = "Incorrect email address";
             return false;
         }
 
         if(this.state.email.substr(this.state.email.length - 4) !== '.edu') {
-            this.state.error = "Email address must end in .edu";
+            this.state.clientError = "Email address must end in .edu";
             return false;
         }
 
         if(this.state.birthday === '') {
-            this.state.error = "Please select your birthday";
+            this.state.clientError = "Please select your birthday";
             return false;
         }
 
         if(this.state.university === 'none') {
-            this.state.error = "Please select your school";
+            this.state.clientError = "Please select your school";
             return false;
         }
 
-        this.state.error = "";
+        this.state.clientError = "";
         return true;
     }
 
     checkEmail() {
+        let responseStatus = 0
         fetch(Config.API_URL+'/user/validate/email/' + this.state.email.toLowerCase(), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-        .then(this.handleErrors)
-        .then( response => response.json())
         .then( response => {
-            this.props.navigation.navigate('SignupStep4', {
-                user: {
-                    firstName: this.props.navigation.state.params.user.firstName,
-                    lastName: this.props.navigation.state.params.user.lastName,
-                    username: this.props.navigation.state.params.user.username,
-                    password: this.props.navigation.state.params.user.password,
-                    email: this.state.email,
-                    university: this.state.university,
-                    birthday: this.state.birthday
-                }
-            });
+            responseStatus = response.status
+            return response.json()
         })
-        .catch( () => { 
-            this.setState({ error2: "Duplicate email"})
-        } )
-    }
-
-    handleErrors(response) {
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        return response;
+        .then( response => {
+            if(responseStatus == 422) {
+                this.setState({
+                    serverError: "Invalid email"
+                })
+            }
+            else if(responseStatus == 409) {
+                this.setState({
+                    serverError: "Duplicate email"
+                })
+            }
+            else if(responseStatus == 200) {
+                this.props.navigation.navigate('SignupStep4', {
+                    user: {
+                        firstName: this.props.navigation.state.params.user.firstName,
+                        lastName: this.props.navigation.state.params.user.lastName,
+                        username: this.props.navigation.state.params.user.username,
+                        password: this.props.navigation.state.params.user.password,
+                        email: this.state.email,
+                        university: this.state.university,
+                        birthday: this.state.birthday
+                    }
+                });
+            }
+            else {
+                this.setState({
+                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    "please let us know at support@thumbtravel.com"
+                })
+            }
+        })
+        .catch( error => {
+            // TOOD log error
+            this.setState({
+                serverError: "Some error occured. Please try again. If problem persists, " + 
+                "please let us know at support@thumbtravel.com"
+            })
+        })
     }
 
     render() {
@@ -98,7 +116,7 @@ export default class SignupStep3 extends Component {
                     <Input
                         onChangeText={(email) => this.setState({
                             email: email.toLowerCase(),
-                            error2: ''
+                            serverError: ''
                             })}
                         value={this.state.email.toLowerCase()}
                     />
@@ -162,13 +180,13 @@ export default class SignupStep3 extends Component {
 
                     <View>
                         <Text>
-                            { this.state.error }
+                            { this.state.clientError }
                         </Text>
                     </View>
 
                     <View>
                         <Text>
-                            { this.state.error2 }
+                            { this.state.serverError }
                         </Text>
                     </View>
                 </Content>
