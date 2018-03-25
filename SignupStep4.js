@@ -6,12 +6,18 @@ import moment from 'moment';
 import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
+const initialState = {
+    serverError: ''
+};
+
 export default class SignupStep4 extends Component {
     constructor(props) {
         super(props);
+        this.state = initialState;
     }
 
     submitUser() {
+        let responseStatus = 0;
         fetch(Config.API_URL+'/user/create', {
             method: 'POST',
             headers: {
@@ -27,22 +33,37 @@ export default class SignupStep4 extends Component {
                 "birthday": this.props.navigation.state.params.user.birthday
             })
         })
-        .then(this.handleErrors)
-        .then( () => {
-            const resetAction = NavigationActions.reset({
-                index: 0,
-                actions: [NavigationActions.navigate({ routeName: 'SignupSuccess' })],
-            });
-            this.props.navigation.dispatch(resetAction);
-        } )
-        .catch( () => {} );
-    }
-
-    handleErrors(response) {
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        return response;
+        .then( response => {
+            responseStatus = response.status;
+            return response.json()
+        })
+        .then( response => {
+            if(responseStatus == 400) {
+                this.setState({
+                    serverError: "Missing one or more user details"
+                })
+            }
+            else if(responseStatus == 200) {
+                const resetAction = NavigationActions.reset({
+                    index: 0,
+                    actions: [NavigationActions.navigate({ routeName: 'SignupSuccess' })],
+                });
+                this.props.navigation.dispatch(resetAction);
+            }
+            else {
+                this.setState({
+                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    "please let us know at support@thumbtravel.com"
+                })
+            }
+        })
+        .catch( error => {
+            // TOOD log error
+            this.setState({
+                serverError: "Some error occured. Please try again. If problem persists, " + 
+                "please let us know at support@thumbtravel.com"
+            })
+        })
     }
 
     render() {
@@ -80,6 +101,12 @@ export default class SignupStep4 extends Component {
                             CONTINUE
                         </Text>
                     </Button>
+
+                    <View>
+                        <Text>
+                            { this.state.serverError }
+                        </Text>
+                    </View>
                 </Content>
             </Container>
         );
