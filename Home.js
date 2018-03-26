@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Image, Linking } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
 
-export default class LoginSuccess extends Component {
+export default class Home extends Component {
     constructor(props) {
         super(props);
     }
@@ -14,15 +14,10 @@ export default class LoginSuccess extends Component {
                     <Image
                         source={require('./assets/thumb-horizontal-logo.png')}
                     />
+                    
                     <View>
                         <Text>
-                            Welcome to thumb!
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            You are logged in successfully.
+                            HOME
                         </Text>
                     </View>
 

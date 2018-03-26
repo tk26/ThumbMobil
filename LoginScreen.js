@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Image, Linking } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
 import Config from 'react-native-config';
+import { onLogIn } from './auth';
 
 const initialState = {
     email: '', password: '', clientError: '', serverError: ''
@@ -15,17 +16,17 @@ export default class LoginScreen extends Component {
 
     canAuthenticateUser() {
         let reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if(!reg.test(this.state.email)) {
+        if (!reg.test(this.state.email)) {
             this.state.clientError = "Incorrect email address";
             return false;
         }
 
-        if(this.state.email.substr(this.state.email.length - 4) !== '.edu') {
+        if (this.state.email.substr(this.state.email.length - 4) !== '.edu') {
             this.state.clientError = "Email address must end in .edu";
             return false;
         }
-        
-        if(this.state.password.length < 8 || this.state.password.length > 30) {
+
+        if (this.state.password.length < 8 || this.state.password.length > 30) {
             this.state.clientError = "Incorrect password";
             return false;
         }
@@ -36,51 +37,55 @@ export default class LoginScreen extends Component {
 
     authenticateUser() {
         let responseStatus = 0;
-        fetch(Config.API_URL+'/user/login', {
+        fetch(Config.API_URL + '/user/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                "email" : this.state.email,
-                "password" : this.state.password
+                "email": this.state.email,
+                "password": this.state.password
             })
         })
-        .then( response => {
-            responseStatus = response.status;
-            return response.json();
-        })
-        .then( response => {
-            if(responseStatus == 400) {
-                this.setState({
-                    serverError: "Invalid email or password"
-                })
-            }
-            else if(responseStatus == 403) {
-                this.setState({
-                    serverError: "It seems that you haven't confirmed your email just yet. " +
+            .then(response => {
+                responseStatus = response.status;
+                return response.json();
+            })
+            .then(response => {
+                if (responseStatus == 400) {
+                    this.setState({
+                        serverError: "Invalid email or password"
+                    })
+                }
+                else if (responseStatus == 403) {
+                    this.setState({
+                        serverError: "It seems that you haven't confirmed your email just yet. " +
                         "We have resent the email verification link to you. " +
                         "Please confirm your email by clicking on it. " +
                         "Feel free to email us at support@thumbtravel.com if you face any issues."
-                })
-            }
-            else if(responseStatus == 200) {
-                this.props.navigation.navigate('LoginSuccess');
-            }
-            else {
+                    })
+                }
+                else if (responseStatus == 200) {
+                    onLogIn(JSON.stringify(response.token))
+                        .then(() => {
+                            global.auth_token = response.token; // hack to make it work in first login run
+                            this.props.navigation.navigate('LoggedInTabs');
+                        })
+                }
+                else {
+                    this.setState({
+                        serverError: "Some error occured. Please try again. If problem persists, " +
+                        "please let us know at support@thumbtravel.com"
+                    })
+                }
+            })
+            .catch(error => {
+                // TODO log error
                 this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    serverError: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
-            }
-        })
-        .catch( error => {
-            // TODO log error
-            this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " + 
-                "please let us know at support@thumbtravel.com"
             })
-        })
     }
 
     render() {
@@ -105,7 +110,7 @@ export default class LoginScreen extends Component {
                         onChangeText={(email) => this.setState({
                             email: email.toLowerCase(),
                             serverError: ''
-                            })}
+                        })}
                         value={this.state.email.toLowerCase()}
                     />
 
@@ -115,15 +120,15 @@ export default class LoginScreen extends Component {
                         </Text>
                     </View>
                     <Input
-                        secureTextEntry = { true } 
+                        secureTextEntry={true}
                         onChangeText={(password) => this.setState({
                             password: password,
                             serverError: ''
-                            })}
+                        })}
                         value={this.state.password}
                     />
 
-                    <Button rounded success onPress={() => this.authenticateUser()} disabled={ !this.canAuthenticateUser() } >
+                    <Button rounded success onPress={() => this.authenticateUser()} disabled={!this.canAuthenticateUser()} >
                         <Text>
                             LOG IN
                         </Text>
@@ -131,19 +136,19 @@ export default class LoginScreen extends Component {
 
                     <View>
                         <Text>
-                            { this.state.clientError }
+                            {this.state.clientError}
                         </Text>
                     </View>
 
                     <View>
                         <Text>
-                            { this.state.serverError }
+                            {this.state.serverError}
                         </Text>
                     </View>
 
                     <View>
-                        <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://thumb-webapp.herokuapp.com/#/forgot')}>
-                                Forgot your password?
+                        <Text style={{ color: 'blue' }} onPress={() => Linking.openURL('https://thumb-webapp.herokuapp.com/#/forgot')}>
+                            Forgot your password?
                         </Text>
                     </View>
 

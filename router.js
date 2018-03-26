@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StackNavigator } from 'react-navigation';
+import { StackNavigator, TabNavigator } from 'react-navigation';
 
 import LaunchScreen from './LaunchScreen';
 import SignupStep1 from './SignupStep1';
@@ -10,7 +10,11 @@ import SignupSuccess from './SignupSuccess';
 import LoginScreen from './LoginScreen';
 import LoginSuccess from './LoginSuccess';
 
-export const SignedOutStack = StackNavigator({
+import Home from './Home';
+import Travel from './Travel';
+import Profile from './Profile';
+
+const SignedOutStack = StackNavigator({
     LaunchScreen: {
         screen: LaunchScreen,
         navigationOptions: {
@@ -52,19 +56,40 @@ export const SignedOutStack = StackNavigator({
         navigationOptions: {
             title: 'Log in'
         }
-    },
-    LoginSuccess: {
-        screen: LoginSuccess,
+    }
+});
+
+const LoggedInTabs = TabNavigator({
+    Home: {
+        screen: Home,
         navigationOptions: {
-            title: 'Log in successful'
+            tabBarLabel: 'Home'
+        }
+    },
+    Travel: {
+        screen: Travel,
+        navigationOptions: {
+            tabBarLabel: 'Travel'
+        }
+    },
+    Profile: {
+        screen: Profile,
+        navigationOptions: {
+            tabBarLabel: 'Profile'
         }
     }
 });
 
-export const createRootNavigator = () => {
+export const createRootNavigator = (loggedIn = false) => {
     return StackNavigator({
         SignedOutStack: {
             screen: SignedOutStack,
+            navigationOptions: {
+                gesturesEnabled: false
+            }
+        },
+        LoggedInTabs: {
+            screen: LoggedInTabs,
             navigationOptions: {
                 gesturesEnabled: false
             }
@@ -73,6 +98,6 @@ export const createRootNavigator = () => {
     {
         headerMode: 'none',
         mode: 'modal',
-        initialRouteName: 'SignedOutStack'
+        initialRouteName: loggedIn ? 'LoggedInTabs' : 'SignedOutStack'
     });
 };
