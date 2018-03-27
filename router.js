@@ -8,7 +8,6 @@ import SignupStep3 from './SignupStep3';
 import SignupStep4 from './SignupStep4';
 import SignupSuccess from './SignupSuccess';
 import LoginScreen from './LoginScreen';
-import LoginSuccess from './LoginSuccess';
 
 import Home from './Home';
 import Travel from './Travel';
