@@ -12,6 +12,7 @@ import LoginScreen from './LoginScreen';
 import Home from './Home';
 import Travel from './Travel';
 import Profile from './Profile';
+import EditProfile from './EditProfile';
 
 const SignedOutStack = StackNavigator({
     LaunchScreen: {
@@ -58,6 +59,21 @@ const SignedOutStack = StackNavigator({
     }
 });
 
+const ProfileStack = StackNavigator({
+    Profile: {
+        screen: Profile,
+        navigationOptions: {
+            title: 'Profile',
+        }
+    },
+    EditProfile: {
+        screen: EditProfile,
+        navigationOptions: {
+            title: 'Edit Profile',
+        }
+    },
+});
+
 const LoggedInTabs = TabNavigator({
     Home: {
         screen: Home,
@@ -72,7 +88,7 @@ const LoggedInTabs = TabNavigator({
         }
     },
     Profile: {
-        screen: Profile,
+        screen: ProfileStack,
         navigationOptions: {
             tabBarLabel: 'Profile'
         }

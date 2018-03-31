@@ -14,7 +14,10 @@ export default class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
+        this.fetchUserProfile();
+    }
 
+    fetchUserProfile() {
         let responseStatus = 0;
         fetch(Config.API_URL + '/user/profile', {
             method: 'GET',
@@ -50,6 +53,13 @@ export default class Profile extends Component {
         })
     }
 
+    refreshUserProfile = (firstName, lastName) => {
+        this.setState({
+            firstName: firstName,
+            lastName: lastName
+        })
+    }
+
     render() {
         return (
             <Container>
@@ -60,37 +70,31 @@ export default class Profile extends Component {
 
                     <View>
                         <Text>
-                            PROFILE
+                            First Name: {this.state.firstName}
                         </Text>
                     </View>
 
                     <View>
                         <Text>
-                            {this.state.firstName}
+                            Last Name: {this.state.lastName}
                         </Text>
                     </View>
 
                     <View>
                         <Text>
-                            {this.state.lastName}
+                            School: {this.state.school}
                         </Text>
                     </View>
 
                     <View>
                         <Text>
-                            {this.state.school}
+                            Username: @{this.state.username}
                         </Text>
                     </View>
 
                     <View>
                         <Text>
-                            {this.state.username}
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            {this.state.profilePicture}
+                            Profile Picture: {this.state.profilePicture}
                         </Text>
                     </View>
 
@@ -101,11 +105,31 @@ export default class Profile extends Component {
                     </View>
 
                     <Button rounded info style={{ alignSelf: 'center' }}
+                        onPress={() =>{
+                            this.props.navigation.navigate('EditProfile', {
+                                user: {
+                                    firstName: this.state.firstName,
+                                    lastName: this.state.lastName,
+                                    username: this.state.username,
+                                    school: this.state.school,
+                                    profilePicture: this.state.profilePicture
+                                },
+                                refresh: this.refreshUserProfile
+                            })
+                        }}
+                    >
+                        <Text>
+                            Edit Profile
+                        </Text>
+                    </Button>
+
+                    <Button rounded info style={{ alignSelf: 'center' }}
                         onPress={() =>
                             onLogOut()
                                 .then(() => {
                                     const resetAction = NavigationActions.reset({
                                         index: 0,
+                                        key: null,
                                         actions: [NavigationActions.navigate({ routeName: 'SignedOutStack' })],
                                     });
                                     this.props.navigation.dispatch(resetAction);
