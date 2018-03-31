@@ -123,6 +123,12 @@ export default class Profile extends Component {
                         </Text>
                     </Button>
 
+                    <Button rounded info style={{ alignSelf: 'center' }}>
+                        <Text>
+                            Settings
+                        </Text>
+                    </Button>
+
                     <Button rounded info style={{ alignSelf: 'center' }}
                         onPress={() =>
                             onLogOut()
