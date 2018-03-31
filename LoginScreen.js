@@ -46,46 +46,43 @@ export default class LoginScreen extends Component {
                 "email": this.state.email,
                 "password": this.state.password
             })
-        })
-            .then(response => {
-                responseStatus = response.status;
-                return response.json();
-            })
-            .then(response => {
-                if (responseStatus == 400) {
-                    this.setState({
-                        serverError: "Invalid email or password"
+        }).then(response => {
+            responseStatus = response.status;
+            return response.json();
+        }).then(response => {
+            if (responseStatus == 400) {
+                this.setState({
+                    serverError: "Invalid email or password"
+                })
+            }
+            else if (responseStatus == 403) {
+                this.setState({
+                    serverError: "It seems that you haven't confirmed your email just yet. " +
+                    "We have resent the email verification link to you. " +
+                    "Please confirm your email by clicking on it. " +
+                    "Feel free to email us at support@thumbtravel.com if you face any issues."
+                })
+            }
+            else if (responseStatus == 200) {
+                onLogIn(JSON.stringify(response.token))
+                    .then(() => {
+                        global.auth_token = response.token; // hack to make it work in first login run
+                        this.props.navigation.navigate('LoggedInTabs');
                     })
-                }
-                else if (responseStatus == 403) {
-                    this.setState({
-                        serverError: "It seems that you haven't confirmed your email just yet. " +
-                        "We have resent the email verification link to you. " +
-                        "Please confirm your email by clicking on it. " +
-                        "Feel free to email us at support@thumbtravel.com if you face any issues."
-                    })
-                }
-                else if (responseStatus == 200) {
-                    onLogIn(JSON.stringify(response.token))
-                        .then(() => {
-                            global.auth_token = response.token; // hack to make it work in first login run
-                            this.props.navigation.navigate('LoggedInTabs');
-                        })
-                }
-                else {
-                    this.setState({
-                        serverError: "Some error occured. Please try again. If problem persists, " +
-                        "please let us know at support@thumbtravel.com"
-                    })
-                }
-            })
-            .catch(error => {
-                // TODO log error
+            }
+            else {
                 this.setState({
                     serverError: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
+            }
+        }).catch(error => {
+            // TODO log error
+            this.setState({
+                serverError: "Some error occured. Please try again. If problem persists, " +
+                "please let us know at support@thumbtravel.com"
             })
+        })
     }
 
     render() {
