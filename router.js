@@ -12,6 +12,7 @@ import LoginScreen from './LoginScreen';
 import Home from './Home';
 import Travel from './Travel';
 import RideStep1 from './RideStep1';
+import RideStep2 from './RideStep2';
 import DriveStep1 from './DriveStep1';
 import Profile from './Profile';
 import EditProfile from './EditProfile';
@@ -87,6 +88,12 @@ const TravelStack = StackNavigator({
         screen: RideStep1,
         navigationOptions: {
             title: 'Ride: Step 1',
+        }
+    },
+    RideStep2: {
+        screen: RideStep2,
+        navigationOptions: {
+            title: 'Ride: Step 2',
         }
     },
     DriveStep1: {
