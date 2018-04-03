@@ -17,9 +17,23 @@ export default class Travel extends Component {
                     
                     <View>
                         <Text>
-                            TRAVEL
+                            What do you want to do?
                         </Text>
                     </View>
+
+                    <Button rounded info style={{ alignSelf: 'center' }}
+                        onPress={() => this.props.navigation.navigate('RideStep1')}>
+                        <Text>
+                            Ride
+                        </Text>
+                    </Button>
+
+                    <Button rounded info style={{ alignSelf: 'center' }}
+                        onPress={() => this.props.navigation.navigate('DriveStep1')}>
+                        <Text>
+                            Drive
+                        </Text>
+                    </Button>
 
                 </Content>
             </Container>

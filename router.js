@@ -11,6 +11,8 @@ import LoginScreen from './LoginScreen';
 
 import Home from './Home';
 import Travel from './Travel';
+import RideStep1 from './RideStep1';
+import DriveStep1 from './DriveStep1';
 import Profile from './Profile';
 import EditProfile from './EditProfile';
 
@@ -74,6 +76,27 @@ const ProfileStack = StackNavigator({
     },
 });
 
+const TravelStack = StackNavigator({
+    Travel: {
+        screen: Travel,
+        navigationOptions: {
+            title: 'Travel',
+        }
+    },
+    RideStep1: {
+        screen: RideStep1,
+        navigationOptions: {
+            title: 'Ride: Step 1',
+        }
+    },
+    DriveStep1: {
+        screen: DriveStep1,
+        navigationOptions: {
+            title: 'Drive: Step 1',
+        }
+    },
+});
+
 const LoggedInTabs = TabNavigator({
     Home: {
         screen: Home,
@@ -82,7 +105,7 @@ const LoggedInTabs = TabNavigator({
         }
     },
     Travel: {
-        screen: Travel,
+        screen: TravelStack,
         navigationOptions: {
             tabBarLabel: 'Travel'
         }
