@@ -130,6 +130,14 @@ export default class Profile extends Component {
                     </Button>
 
                     <Button rounded info style={{ alignSelf: 'center' }}
+                        onPress={() => this.props.navigation.navigate('Feedback') }
+                    >
+                        <Text>
+                            Give us some feedback
+                        </Text>
+                    </Button>
+
+                    <Button rounded info style={{ alignSelf: 'center' }}
                         onPress={() =>
                             onLogOut()
                                 .then(() => {

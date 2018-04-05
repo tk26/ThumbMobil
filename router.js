@@ -16,6 +16,8 @@ import RideStep2 from './RideStep2';
 import DriveStep1 from './DriveStep1';
 import Profile from './Profile';
 import EditProfile from './EditProfile';
+import Feedback from './Feedback';
+import ReportBug from './ReportBug';
 
 const SignedOutStack = StackNavigator({
     LaunchScreen: {
@@ -73,6 +75,18 @@ const ProfileStack = StackNavigator({
         screen: EditProfile,
         navigationOptions: {
             title: 'Edit Profile',
+        }
+    },
+    Feedback: {
+        screen: Feedback,
+        navigationOptions: {
+            title: 'Feedback',
+        }
+    },
+    ReportBug: {
+        screen: ReportBug,
+        navigationOptions: {
+            title: 'Report a bug',
         }
     },
 });
