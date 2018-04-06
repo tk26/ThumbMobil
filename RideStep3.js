@@ -3,23 +3,13 @@ import { Image, Linking, TextInput } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
 
 const initialState = {
-    pickupNotes: '', clientError: ''
+    pickupNotes: ''
 }
 
 export default class RideStep3 extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
-    }
-
-    validate() {
-        if (this.state.pickupNotes.length > 100) {
-            this.state.clientError = "Pickup notes should be less than 100 characters";
-            return false;
-        }
-
-        this.state.clientError = "";
-        return true;
     }
 
     render() {
@@ -38,6 +28,7 @@ export default class RideStep3 extends Component {
                     </View>
 
                     <TextInput
+                        maxLength={100}
                         multiline={true}
                         numberOfLines={4}
                         placeholder="this will be shared with your driver"
@@ -45,17 +36,11 @@ export default class RideStep3 extends Component {
                         value={this.state.pickupNotes}
                     />
 
-                    <Button rounded success disabled={!this.validate()}>
+                    <Button rounded success>
                         <Text>
                             SUBMIT
                         </Text>
                     </Button>
-
-                    <View>
-                        <Text>
-                            {this.state.clientError}
-                        </Text>
-                    </View>
                 </Content>
             </Container>
         );
