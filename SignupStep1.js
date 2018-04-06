@@ -26,7 +26,7 @@ export default class SignupStep1 extends Component {
         }
         if (!usernameRegex.test(this.state.username)) {
             this.setState({
-                error: "Username should be between 3 to 30 characters" +
+                error: "Username should be between 3 to 30 characters " +
                 "and can only contain numbers, letters, periods and underscores"
             })
             return;
@@ -128,6 +128,7 @@ export default class SignupStep1 extends Component {
                         </Text>
                     </View>
                     <Input
+                        maxLength={30}
                         autoCorrect={false}
                         autoCapitalize="none"
                         onChangeText={(username) => {
