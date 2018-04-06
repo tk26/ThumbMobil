@@ -3,8 +3,10 @@ import { Container, Content, View, Text, Button, Input } from 'native-base';
 import Config from 'react-native-config';
 
 const initialState = {
-    firstName: '', lastName: '', username: '', clientError: '', serverError: ''
+    firstName: '', lastName: '', username: '', error: ''
 };
+
+const usernameRegex = /^[a-z0-9._]{3,30}$/;
 
 export default class SignupStep1 extends Component {
     constructor(props) {
@@ -12,73 +14,71 @@ export default class SignupStep1 extends Component {
         this.state = initialState;
     }
 
-    canGoNext() {
-        if(this.state.firstName.length < 1 || this.state.firstName.length > 30) {
-            this.state.clientError = "First Name should be between 1 to 30 characters";
-            return false;
+    validate() {
+        // client side validation
+        if (this.state.firstName.length < 1) {
+            this.setState({ error: "First Name cannot be empty" });
+            return;
+        }
+        if (this.state.lastName.length < 1) {
+            this.setState({ error: "Last Name cannot be empty" });
+            return;
+        }
+        if (!usernameRegex.test(this.state.username)) {
+            this.setState({
+                error: "Username should be between 3 to 30 characters" +
+                "and can only contain numbers, letters, periods and underscores"
+            })
+            return;
         }
 
-        if(this.state.lastName.length < 1 || this.state.lastName.length > 30) {
-            this.state.clientError = "Last Name should be between 1 to 30 characters";
-            return false;
-        }
-
-        let regex = /^[a-z0-9._]{3,30}$/;
-        if (!regex.test(this.state.username)) {
-            this.state.clientError = "Username should be between 3 to 30 characters and can only contain numbers, letters, periods and underscores";
-            return false;
-        }
-
-        this.state.clientError = "";
-        return true;
-    }
-
-    checkUsername() {
+        // server side validation
         let responseStatus = 0;
-        fetch(Config.API_URL+'/user/validate/username/' + this.state.username, {
+        fetch(Config.API_URL + '/user/validate/username/' + this.state.username, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-        .then( response => {
-            responseStatus = response.status
-            return response.json()
-        })
-        .then( response => {
-            if(responseStatus == 422) {
+            .then(response => {
+                responseStatus = response.status
+                return response.json()
+            })
+            .then(response => {
+                if (responseStatus == 422) {
+                    this.setState({
+                        error: "Invalid username"
+                    })
+                }
+                else if (responseStatus == 409) {
+                    this.setState({
+                        error: "Duplicate username"
+                    })
+                }
+                else if (responseStatus == 200) {
+                    // validation success
+                    this.props.navigation.navigate('SignupStep2', {
+                        user: {
+                            firstName: this.state.firstName,
+                            lastName: this.state.lastName,
+                            username: this.state.username
+                        }
+                    });
+                }
+                else {
+                    this.setState({
+                        error: "Some error occured. Please try again. If problem persists, " +
+                        "please let us know at support@thumbtravel.com"
+                    })
+                }
+            })
+            .catch(error => {
+                // TOOD log error
                 this.setState({
-                    serverError: "Invalid username"
-                })
-            }
-            else if(responseStatus == 409) {
-                this.setState({
-                    serverError: "Duplicate username"
-                })
-            }
-            else if(responseStatus == 200) {
-                this.props.navigation.navigate('SignupStep2', {
-                    user: {
-                        firstName: this.state.firstName,
-                        lastName: this.state.lastName,
-                        username: this.state.username
-                    }
-                });
-            }
-            else {
-                this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
-            }
-        })
-        .catch( error => {
-            // TOOD log error
-            this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " + 
-                "please let us know at support@thumbtravel.com"
             })
-        })
     }
 
     render() {
@@ -94,7 +94,15 @@ export default class SignupStep1 extends Component {
                         </Text>
                     </View>
                     <Input
-                        onChangeText={(firstName) => this.setState({firstName})}
+                        maxLength={30}
+                        autoCorrect={false}
+                        autoCapitalize="words"
+                        onChangeText={(firstName) =>
+                            this.setState({
+                                firstName,
+                                error: '',
+                            })
+                        }
                         value={this.state.firstName}
                     />
                     <View>
@@ -103,7 +111,15 @@ export default class SignupStep1 extends Component {
                         </Text>
                     </View>
                     <Input
-                        onChangeText={(lastName) => this.setState({lastName})}
+                        maxLength={30}
+                        autoCorrect={false}
+                        autoCapitalize="words"
+                        onChangeText={(lastName) =>
+                            this.setState({
+                                lastName,
+                                error: '',
+                            })
+                        }
                         value={this.state.lastName}
                     />
                     <View>
@@ -112,17 +128,17 @@ export default class SignupStep1 extends Component {
                         </Text>
                     </View>
                     <Input
+                        autoCorrect={false}
+                        autoCapitalize="none"
                         onChangeText={(username) => {
                             this.setState({
                                 username: username.toLowerCase(),
-                                serverError: ''
+                                error: '',
                             })
                         }}
-                        value={this.state.username.toLowerCase()}
+                        value={this.state.username}
                     />
-                    <Button rounded success
-                        onPress={() => this.checkUsername()} 
-                        disabled={ !this.canGoNext() }>
+                    <Button rounded success onPress={() => this.validate()}>
                         <Text>
                             NEXT
                         </Text>
@@ -130,16 +146,9 @@ export default class SignupStep1 extends Component {
 
                     <View>
                         <Text>
-                            { this.state.clientError }
+                            {this.state.error}
                         </Text>
                     </View>
-
-                    <View>
-                        <Text>
-                            { this.state.serverError }
-                        </Text>
-                    </View>
-
                 </Content>
             </Container>
         );
