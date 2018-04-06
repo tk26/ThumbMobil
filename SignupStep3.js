@@ -5,8 +5,10 @@ import DatePicker from 'react-native-datepicker';
 import moment from 'moment';
 
 const initialState = {
-    email: '', university: 'none', birthday: '', clientError: '', serverError: ''
+    email: '', university: 'none', birthday: '', error: ''
 };
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default class SignupStep3 extends Component {
     constructor(props) {
@@ -14,88 +16,80 @@ export default class SignupStep3 extends Component {
         this.state = initialState;
     }
 
-    onValueChange(value) {
-        this.setState({
-            university: value
-        });
+    onValueChange(university) {
+        this.setState({ university, error: '' });
     }
 
-    canGoNext() {
-        let reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if(!reg.test(this.state.email)) {
-            this.state.clientError = "Incorrect email address";
-            return false;
+    validate() {
+        // client side validation
+        if (this.state.birthday === '') {
+            this.setState({ error: "Please select your birthday" });
+            return;
+        }
+        if (this.state.university === 'none') {
+            this.setState({ error: "Please select your school" });
+            return;
+        }
+        if (!emailRegex.test(this.state.email)) {
+            this.setState({ error: "Incorrect email address" });
+            return;
+        }
+        if (this.state.email.substr(this.state.email.length - 4) !== '.edu') {
+            this.setState({ error: "Email address must end in .edu" });
+            return;
         }
 
-        if(this.state.email.substr(this.state.email.length - 4) !== '.edu') {
-            this.state.clientError = "Email address must end in .edu";
-            return false;
-        }
-
-        if(this.state.birthday === '') {
-            this.state.clientError = "Please select your birthday";
-            return false;
-        }
-
-        if(this.state.university === 'none') {
-            this.state.clientError = "Please select your school";
-            return false;
-        }
-
-        this.state.clientError = "";
-        return true;
-    }
-
-    checkEmail() {
+        // server side validation
         let responseStatus = 0
-        fetch(Config.API_URL+'/user/validate/email/' + this.state.email.toLowerCase(), {
+        fetch(Config.API_URL + '/user/validate/email/' + this.state.email.toLowerCase(), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-        .then( response => {
-            responseStatus = response.status
-            return response.json()
-        })
-        .then( response => {
-            if(responseStatus == 422) {
+            .then(response => {
+                responseStatus = response.status
+                return response.json()
+            })
+            .then(response => {
+                if (responseStatus == 422) {
+                    this.setState({
+                        error: "Invalid email"
+                    })
+                }
+                else if (responseStatus == 409) {
+                    this.setState({
+                        error: "Duplicate email"
+                    })
+                }
+                else if (responseStatus == 200) {
+                    // validation success
+                    this.props.navigation.navigate('SignupStep4', {
+                        user: {
+                            firstName: this.props.navigation.state.params.user.firstName,
+                            lastName: this.props.navigation.state.params.user.lastName,
+                            username: this.props.navigation.state.params.user.username,
+                            password: this.props.navigation.state.params.user.password,
+                            email: this.state.email,
+                            university: this.state.university,
+                            birthday: this.state.birthday
+                        }
+                    });
+                }
+                else {
+                    this.setState({
+                        error: "Some error occured. Please try again. If problem persists, " +
+                        "please let us know at support@thumbtravel.com"
+                    })
+                }
+            })
+            .catch(error => {
+                // TOOD log error
                 this.setState({
-                    serverError: "Invalid email"
-                })
-            }
-            else if(responseStatus == 409) {
-                this.setState({
-                    serverError: "Duplicate email"
-                })
-            }
-            else if(responseStatus == 200) {
-                this.props.navigation.navigate('SignupStep4', {
-                    user: {
-                        firstName: this.props.navigation.state.params.user.firstName,
-                        lastName: this.props.navigation.state.params.user.lastName,
-                        username: this.props.navigation.state.params.user.username,
-                        password: this.props.navigation.state.params.user.password,
-                        email: this.state.email,
-                        university: this.state.university,
-                        birthday: this.state.birthday
-                    }
-                });
-            }
-            else {
-                this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
-            }
-        })
-        .catch( error => {
-            // TOOD log error
-            this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " + 
-                "please let us know at support@thumbtravel.com"
             })
-        })
     }
 
     render() {
@@ -114,11 +108,14 @@ export default class SignupStep3 extends Component {
                         </Text>
                     </View>
                     <Input
+                        maxLength={254}
+                        autoCorrect={false}
+                        autoCapitalize="none"
                         onChangeText={(email) => this.setState({
                             email: email.toLowerCase(),
-                            serverError: ''
-                            })}
-                        value={this.state.email.toLowerCase()}
+                            error: ''
+                        })}
+                        value={this.state.email}
                     />
                     <View>
                         <Text>
@@ -139,8 +136,8 @@ export default class SignupStep3 extends Component {
                     <Picker
                         iosHeader="University"
                         mode="dropdown"
-                        selectedValue = { this.state.university }
-                        onValueChange = { this.onValueChange.bind(this) }
+                        selectedValue={this.state.university}
+                        onValueChange={this.onValueChange.bind(this)}
                     >
                         <Picker.Item label="Select University" value="none" />
                         <Picker.Item label="Indiana University" value="indiana-university" />
@@ -160,19 +157,19 @@ export default class SignupStep3 extends Component {
                         </Text>
                     </View>
                     <DatePicker
-                            style={{width: 200}}
-                            date={this.state.birthday}
-                            mode="date"
-                            placeholder="select birthday"
-                            format="MM-DD-YYYY"
-                            minDate={moment().subtract(25, 'y')}
-                            maxDate={moment().subtract(16, 'y')}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            onDateChange={(date) => {this.setState({birthday: date})}}
-                        />
-                    
-                    <Button rounded success onPress={() => this.checkEmail()} disabled={ !this.canGoNext() }>
+                        style={{ width: 200 }}
+                        date={this.state.birthday}
+                        mode="date"
+                        placeholder="select birthday"
+                        format="MM-DD-YYYY"
+                        minDate={new Date(moment().subtract(25, 'y'))}
+                        maxDate={new Date(moment().subtract(16, 'y'))}
+                        confirmBtnText="Confirm"
+                        cancelBtnText="Cancel"
+                        onDateChange={(date) => { this.setState({ birthday: date, error: '' }) }}
+                    />
+
+                    <Button rounded success onPress={() => this.validate()}>
                         <Text>
                             NEXT
                         </Text>
@@ -180,13 +177,7 @@ export default class SignupStep3 extends Component {
 
                     <View>
                         <Text>
-                            { this.state.clientError }
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            { this.state.serverError }
+                            {this.state.error}
                         </Text>
                     </View>
                 </Content>
