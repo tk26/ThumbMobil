@@ -7,7 +7,7 @@ import Config from 'react-native-config';
 
 const initialState = {
     firstName: '', lastName: '', school: '',
-    username: '', profilePicture: '', serverError: ''
+    username: '', profilePicture: '', error: ''
 };
 
 export default class Profile extends Component {
@@ -31,7 +31,7 @@ export default class Profile extends Component {
         }).then( response => {
             if (responseStatus == 403) {
                 this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " +
+                    error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
             }
@@ -47,7 +47,7 @@ export default class Profile extends Component {
         }).catch(error => {
             // TODO log error
             this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " +
+                error: "Some error occured. Please try again. If problem persists, " +
                 "please let us know at support@thumbtravel.com"
             })
         })
@@ -100,7 +100,7 @@ export default class Profile extends Component {
 
                     <View>
                         <Text>
-                            {this.state.serverError}
+                            {this.state.error}
                         </Text>
                     </View>
 
