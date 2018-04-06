@@ -28,15 +28,15 @@ export default class LaunchScreen extends Component {
                     <View>
                         <Text>
                             By tapping Log In or Create Account, I agree to thumb's&nbsp;
-                            <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://www.google.com')}>
+                            <Text style={{ color: 'blue' }} onPress={() => Linking.openURL('https://www.google.com')}>
                                 Terms of Service
                             </Text>
                             ,&nbsp;
-                            <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://www.google.com')}>
-                                 Privacy Policy
+                            <Text style={{ color: 'blue' }} onPress={() => Linking.openURL('https://www.google.com')}>
+                                Privacy Policy
                             </Text>
                             , and&nbsp;
-                            <Text style={{color: 'blue'}} onPress={() => Linking.openURL('https://www.google.com')}>
+                            <Text style={{ color: 'blue' }} onPress={() => Linking.openURL('https://www.google.com')}>
                                 Non-discrimination Policy
                             </Text>
                             .
