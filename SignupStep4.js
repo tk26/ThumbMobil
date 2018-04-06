@@ -41,6 +41,7 @@ export default class SignupStep4 extends Component {
                     })
                 }
                 else if (responseStatus == 200) {
+                    // account created successfully
                     const resetAction = NavigationActions.reset({
                         index: 0,
                         actions: [NavigationActions.navigate({ routeName: 'SignupSuccess' })],

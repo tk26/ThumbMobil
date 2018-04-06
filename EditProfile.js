@@ -8,11 +8,21 @@ export default class EditProfile extends Component {
     constructor(props) {
         super(props);
         this.state = this.props.navigation.state.params.user;
-        this.state.clientError = '';
-        this.state.serverError = '';
+        this.state.error = '';
     }
 
-    updateUserProfile() {
+    validateAndUpdate() {
+        // client side validation
+        if (this.state.firstName.length < 1) {
+            this.setState({ error: "First Name cannot be empty" });
+            return;
+        }
+        if (this.state.lastName.length < 1) {
+            this.setState({ error: "Last Name cannot be empty" });
+            return;
+        }
+
+        // server side validation
         let responseStatus = 0;
         fetch(Config.API_URL+'/user/edit/', {
             method: 'PUT',
@@ -32,19 +42,19 @@ export default class EditProfile extends Component {
         .then( response => {
             if(responseStatus == 400) {
                 this.setState({
-                    serverError: "Invalid user details"
+                    error: "Invalid user details"
                 })
             }
             else if(responseStatus == 200) {
-                // say updated!
+                // profile updated successfully
                 this.setState({
-                    serverError: response.message
+                    error: response.message
                 })
                 this.props.navigation.state.params.refresh(this.state.firstName, this.state.lastName);
             }
             else {
                 this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    error: "Some error occured. Please try again. If problem persists, " + 
                     "please let us know at support@thumbtravel.com"
                 })
             }
@@ -52,25 +62,10 @@ export default class EditProfile extends Component {
         .catch( error => {
             // TOOD log error
             this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " + 
+                error: "Some error occured. Please try again. If problem persists, " + 
                 "please let us know at support@thumbtravel.com"
             })
         })
-    }
-
-    validateUserProfile() {
-        if(this.state.firstName.length < 1 || this.state.firstName.length > 30) {
-            this.state.clientError = "First Name should be between 1 to 30 characters";
-            return false;
-        }
-
-        if(this.state.lastName.length < 1 || this.state.lastName.length > 30) {
-            this.state.clientError = "Last Name should be between 1 to 30 characters";
-            return false;
-        }
-
-        this.state.clientError = "";
-        return true;
     }
 
     render() {
@@ -88,7 +83,10 @@ export default class EditProfile extends Component {
                     </View>
 
                     <Input
-                        onChangeText={(firstName) => this.setState({firstName})}
+                        maxLength={30}
+                        autoCorrect={false}
+                        autoCapitalize="words"
+                        onChangeText={(firstName) => this.setState({firstName, error: ''})}
                         value={this.state.firstName}
                     />
 
@@ -99,7 +97,10 @@ export default class EditProfile extends Component {
                     </View>
 
                     <Input
-                        onChangeText={(lastName) => this.setState({lastName})}
+                        maxLength={30}
+                        autoCorrect={false}
+                        autoCapitalize="words"
+                        onChangeText={(lastName) => this.setState({lastName, error: ''})}
                         value={this.state.lastName}
                     />
 
@@ -121,8 +122,7 @@ export default class EditProfile extends Component {
                         </Text>
                     </View>
 
-                    <Button rounded success disabled={!this.validateUserProfile()}
-                        onPress={() => this.updateUserProfile()} >
+                    <Button rounded success onPress={() => this.validateAndUpdate()}>
                         <Text>
                             UPDATE
                         </Text>
@@ -130,13 +130,7 @@ export default class EditProfile extends Component {
                     
                     <View>
                         <Text>
-                            { this.state.clientError }
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            { this.state.serverError }
+                            { this.state.error }
                         </Text>
                     </View>
                 </Content>
