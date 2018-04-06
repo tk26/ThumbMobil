@@ -5,31 +5,39 @@ const initialState = {
     password: '', confirmPassword: '', error: ''
 };
 
+const passwordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+
 export default class SignupStep2 extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
     }
 
-    canGoNext() {
-        if(this.state.password.length < 8 || this.state.password.length > 30) {
-            this.state.error = "Password should be between 8 to 30 characters";
-            return false;
+    validate() {
+        if (this.state.password.length < 8 || this.state.password.length > 30) {
+            this.setState({ error: "Password should be between 8 to 30 characters" });
+            return;
         }
-
-        let regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
-        if(!regex.test(this.state.password)) {
-            this.state.error = "Password should be a combinaton of upper and lowercase letters, a number and a special character";
-            return false;
+        if (!passwordRegex.test(this.state.password)) {
+            this.setState({
+                error: "Password should be a combinaton of upper and lowercase letters, " +
+                "a number and a special character"
+            })
+            return;
         }
-
-        if(this.state.password !== this.state.confirmPassword) {
-            this.state.error = "Password and Confirm Password do not match";
-            return false;
+        if (this.state.password !== this.state.confirmPassword) {
+            this.setState({ error: "Password and Confirm Password do not match" });
+            return;
         }
-
-        this.state.error = "";
-        return true;
+        // validation success
+        this.props.navigation.navigate('SignupStep3', {
+            user: {
+                firstName: this.props.navigation.state.params.user.firstName,
+                lastName: this.props.navigation.state.params.user.lastName,
+                username: this.props.navigation.state.params.user.username,
+                password: this.state.password
+            }
+        })
     }
 
     render() {
@@ -46,15 +54,17 @@ export default class SignupStep2 extends Component {
                             - Use at least one number {'\n'}
                         </Text>
                     </View>
-                    
+
                     <View>
                         <Text>
                             PASSWORD
                         </Text>
                     </View>
                     <Input
-                        secureTextEntry = { true } 
-                        onChangeText={(password) => this.setState({password})}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        secureTextEntry={true}
+                        onChangeText={(password) => this.setState({ password, error: '' })}
                         value={this.state.password}
                     />
 
@@ -64,19 +74,14 @@ export default class SignupStep2 extends Component {
                         </Text>
                     </View>
                     <Input
-                        secureTextEntry = { true } 
-                        onChangeText={(confirmPassword) => this.setState({confirmPassword})}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        secureTextEntry={true}
+                        onChangeText={(confirmPassword) => this.setState({ confirmPassword, error: '' })}
                         value={this.state.confirmPassword}
                     />
-                    
-                    <Button rounded success onPress={() => this.props.navigation.navigate('SignupStep3', {
-                            user: {
-                                firstName: this.props.navigation.state.params.user.firstName,
-                                lastName: this.props.navigation.state.params.user.lastName,
-                                username: this.props.navigation.state.params.user.username,
-                                password: this.state.password
-                            }
-                        })} disabled={ !this.canGoNext() }>
+
+                    <Button rounded success onPress={() => this.validate()}>
                         <Text>
                             NEXT
                         </Text>
@@ -84,7 +89,7 @@ export default class SignupStep2 extends Component {
 
                     <View>
                         <Text>
-                            { this.state.error }
+                            {this.state.error}
                         </Text>
                     </View>
                 </Content>
