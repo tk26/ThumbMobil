@@ -5,7 +5,7 @@ import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
 const initialState = {
-    feature: '', clientError: '', serverError: ''
+    feature: '', error: ''
 };
 
 export default class RequestFeature extends Component {
@@ -14,61 +14,56 @@ export default class RequestFeature extends Component {
         this.state = initialState;
     }
 
-    validateFeature() {
-        if(this.state.feature.length < 1 || this.state.feature.length > 400) {
-            this.state.clientError = "Please describe in 1 to 400 characters";
-            return false;
+    submitFeature() {
+        if (this.state.feature.length < 1) {
+            this.setState({ error: "Feature cannot be empty" });
+            return;
         }
 
-        this.state.clientError = "";
-        return true;
-    }
-
-    submitFeature() {
         let responseStatus = 0;
-        fetch(Config.API_URL+'/feedback/submit/', {
+        fetch(Config.API_URL + '/feedback/submit/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer' + ' ' + global.auth_token
             },
             body: JSON.stringify({
-                "feedbackType" : "feature",
+                "feedbackType": "feature",
                 "feedbackDescription": this.state.feature
             })
         })
-        .then( response => {
-            responseStatus = response.status
-            return response.json()
-        })
-        .then( response => {
-            if(responseStatus == 400) {
+            .then(response => {
+                responseStatus = response.status
+                return response.json()
+            })
+            .then(response => {
+                if (responseStatus == 400) {
+                    this.setState({
+                        error: "Invalid user details"
+                    })
+                }
+                else if (responseStatus == 200) {
+                    // go back to Feedback Screen and show the message there
+                    this.props.navigation.state.params.showFeedbackSubmitMessage(response.message);
+                    const backAction = NavigationActions.back({
+                        key: null
+                    });
+                    this.props.navigation.dispatch(backAction);
+                }
+                else {
+                    this.setState({
+                        error: "Some error occured. Please try again. If problem persists, " +
+                        "please let us know at support@thumbtravel.com"
+                    })
+                }
+            })
+            .catch(error => {
+                // TODO log error
                 this.setState({
-                    serverError: "Invalid user details"
-                })
-            }
-            else if(responseStatus == 200) {
-                // go back to Feedback Screen and show the message there
-                this.props.navigation.state.params.showFeedbackSubmitMessage(response.message);
-                const backAction = NavigationActions.back({
-                    key: null
-                });
-                this.props.navigation.dispatch(backAction);
-            }
-            else {
-                this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
-            }
-        })
-        .catch( error => {
-            // TOOD log error
-            this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " + 
-                "please let us know at support@thumbtravel.com"
             })
-        })
     }
 
     render() {
@@ -101,6 +96,7 @@ export default class RequestFeature extends Component {
                     </View>
 
                     <TextInput
+                        maxLength={400}
                         multiline={true}
                         numberOfLines={4}
                         placeholder="I would love to get push notifications"
@@ -108,22 +104,15 @@ export default class RequestFeature extends Component {
                         value={this.state.feature}
                     />
 
-                    <Button rounded success disabled={!this.validateFeature()}
-                        onPress={() => this.submitFeature()} >
+                    <Button rounded success onPress={() => this.submitFeature()} >
                         <Text>
                             SUBMIT
                         </Text>
                     </Button>
-                    
-                    <View>
-                        <Text>
-                            { this.state.clientError }
-                        </Text>
-                    </View>
 
                     <View>
                         <Text>
-                            { this.state.serverError }
+                            {this.state.error}
                         </Text>
                     </View>
                 </Content>
