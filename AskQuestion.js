@@ -5,7 +5,7 @@ import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
 const initialState = {
-    question: '', clientError: '', serverError: ''
+    question: '', error: ''
 };
 
 export default class AskQuestion extends Component {
@@ -14,61 +14,56 @@ export default class AskQuestion extends Component {
         this.state = initialState;
     }
 
-    validateQuestion() {
-        if(this.state.question.length < 1 || this.state.question.length > 400) {
-            this.state.clientError = "Please describe in 1 to 400 characters";
-            return false;
+    submitQuestion() {
+        if (this.state.question.length < 1) {
+            this.setState({ error: "Question cannot be empty" });
+            return;
         }
 
-        this.state.clientError = "";
-        return true;
-    }
-
-    submitQuestion() {
         let responseStatus = 0;
-        fetch(Config.API_URL+'/feedback/submit/', {
+        fetch(Config.API_URL + '/feedback/submit/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer' + ' ' + global.auth_token
             },
             body: JSON.stringify({
-                "feedbackType" : "question",
+                "feedbackType": "question",
                 "feedbackDescription": this.state.question
             })
         })
-        .then( response => {
-            responseStatus = response.status
-            return response.json()
-        })
-        .then( response => {
-            if(responseStatus == 400) {
+            .then(response => {
+                responseStatus = response.status
+                return response.json()
+            })
+            .then(response => {
+                if (responseStatus == 400) {
+                    this.setState({
+                        error: "Invalid user details"
+                    })
+                }
+                else if (responseStatus == 200) {
+                    // go back to Feedback Screen and show the message there
+                    this.props.navigation.state.params.showFeedbackSubmitMessage(response.message);
+                    const backAction = NavigationActions.back({
+                        key: null
+                    });
+                    this.props.navigation.dispatch(backAction);
+                }
+                else {
+                    this.setState({
+                        error: "Some error occured. Please try again. If problem persists, " +
+                        "please let us know at support@thumbtravel.com"
+                    })
+                }
+            })
+            .catch(error => {
+                // TODO log error
                 this.setState({
-                    serverError: "Invalid user details"
-                })
-            }
-            else if(responseStatus == 200) {
-                // go back to Feedback Screen and show the message there
-                this.props.navigation.state.params.showFeedbackSubmitMessage(response.message);
-                const backAction = NavigationActions.back({
-                    key: null
-                });
-                this.props.navigation.dispatch(backAction);
-            }
-            else {
-                this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
-            }
-        })
-        .catch( error => {
-            // TOOD log error
-            this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " + 
-                "please let us know at support@thumbtravel.com"
             })
-        })
     }
 
     render() {
@@ -101,29 +96,23 @@ export default class AskQuestion extends Component {
                     </View>
 
                     <TextInput
+                        maxLength={400}
                         multiline={true}
                         numberOfLines={4}
                         placeholder="Where can I see my upcoming trips?"
-                        onChangeText={(question) => this.setState({ question })}
+                        onChangeText={(question) => this.setState({ question, error: '' })}
                         value={this.state.question}
                     />
 
-                    <Button rounded success disabled={!this.validateQuestion()}
-                        onPress={() => this.submitQuestion()} >
+                    <Button rounded success onPress={() => this.submitQuestion()}>
                         <Text>
                             SUBMIT
                         </Text>
                     </Button>
-                    
-                    <View>
-                        <Text>
-                            { this.state.clientError }
-                        </Text>
-                    </View>
 
                     <View>
                         <Text>
-                            { this.state.serverError }
+                            {this.state.error}
                         </Text>
                     </View>
                 </Content>

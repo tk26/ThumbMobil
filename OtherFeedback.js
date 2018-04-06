@@ -5,7 +5,7 @@ import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
 const initialState = {
-    other: '', clientError: '', serverError: ''
+    other: '', error: ''
 };
 
 export default class OtherFeedback extends Component {
@@ -14,17 +14,12 @@ export default class OtherFeedback extends Component {
         this.state = initialState;
     }
 
-    validateOther() {
-        if(this.state.other.length < 1 || this.state.other.length > 400) {
-            this.state.clientError = "Please describe in 1 to 400 characters";
-            return false;
+    submitOther() {
+        if (this.state.other.length < 1) {
+            this.setState({ error: "Description cannot be empty" });
+            return;
         }
 
-        this.state.clientError = "";
-        return true;
-    }
-
-    submitOther() {
         let responseStatus = 0;
         fetch(Config.API_URL+'/feedback/submit/', {
             method: 'POST',
@@ -44,7 +39,7 @@ export default class OtherFeedback extends Component {
         .then( response => {
             if(responseStatus == 400) {
                 this.setState({
-                    serverError: "Invalid user details"
+                    error: "Invalid user details"
                 })
             }
             else if(responseStatus == 200) {
@@ -57,15 +52,15 @@ export default class OtherFeedback extends Component {
             }
             else {
                 this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " + 
+                    error: "Some error occured. Please try again. If problem persists, " + 
                     "please let us know at support@thumbtravel.com"
                 })
             }
         })
         .catch( error => {
-            // TOOD log error
+            // TODO log error
             this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " + 
+                error: "Some error occured. Please try again. If problem persists, " + 
                 "please let us know at support@thumbtravel.com"
             })
         })
@@ -101,6 +96,7 @@ export default class OtherFeedback extends Component {
                     </View>
 
                     <TextInput
+                        maxLength={400}
                         multiline={true}
                         numberOfLines={4}
                         placeholder="thumb has changed my life"
@@ -108,8 +104,7 @@ export default class OtherFeedback extends Component {
                         value={this.state.other}
                     />
 
-                    <Button rounded success disabled={!this.validateOther()}
-                        onPress={() => this.submitOther()} >
+                    <Button rounded success onPress={() => this.submitOther()} >
                         <Text>
                             SUBMIT
                         </Text>
@@ -117,13 +112,7 @@ export default class OtherFeedback extends Component {
                     
                     <View>
                         <Text>
-                            { this.state.clientError }
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            { this.state.serverError }
+                            { this.state.error }
                         </Text>
                     </View>
                 </Content>
