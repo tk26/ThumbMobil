@@ -5,8 +5,10 @@ import Config from 'react-native-config';
 import { onLogIn } from './auth';
 
 const initialState = {
-    email: '', password: '', clientError: '', serverError: ''
+    email: '', password: '', error: ''
 };
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -14,28 +16,22 @@ export default class LoginScreen extends Component {
         this.state = initialState;
     }
 
-    canAuthenticateUser() {
-        let reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!reg.test(this.state.email)) {
-            this.state.clientError = "Incorrect email address";
-            return false;
+    validate() {
+        // client side validation
+        if (!emailRegex.test(this.state.email)) {
+            this.setState({ error: "Incorrect email address" });
+            return;
         }
-
         if (this.state.email.substr(this.state.email.length - 4) !== '.edu') {
-            this.state.clientError = "Email address must end in .edu";
-            return false;
+            this.setState({ error: "Email address must end in .edu" });
+            return;
+        }
+        if (this.state.password.length < 8) {
+            this.setState({ error: "Incorrect password" });
+            return;
         }
 
-        if (this.state.password.length < 8 || this.state.password.length > 30) {
-            this.state.clientError = "Incorrect password";
-            return false;
-        }
-
-        this.state.clientError = "";
-        return true;
-    }
-
-    authenticateUser() {
+        // server side validation
         let responseStatus = 0;
         fetch(Config.API_URL + '/user/login', {
             method: 'POST',
@@ -52,18 +48,19 @@ export default class LoginScreen extends Component {
         }).then(response => {
             if (responseStatus == 400) {
                 this.setState({
-                    serverError: "Invalid email or password"
+                    error: "Invalid email or password"
                 })
             }
             else if (responseStatus == 403) {
                 this.setState({
-                    serverError: "It seems that you haven't confirmed your email just yet. " +
+                    error: "It seems that you haven't confirmed your email just yet. " +
                     "We have resent the email verification link to you. " +
                     "Please confirm your email by clicking on it. " +
                     "Feel free to email us at support@thumbtravel.com if you face any issues."
                 })
             }
             else if (responseStatus == 200) {
+                // validation success
                 onLogIn(JSON.stringify(response.token))
                     .then(() => {
                         global.auth_token = response.token; // hack to make it work in first login run
@@ -72,14 +69,14 @@ export default class LoginScreen extends Component {
             }
             else {
                 this.setState({
-                    serverError: "Some error occured. Please try again. If problem persists, " +
+                    error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
             }
         }).catch(error => {
             // TODO log error
             this.setState({
-                serverError: "Some error occured. Please try again. If problem persists, " +
+                error: "Some error occured. Please try again. If problem persists, " +
                 "please let us know at support@thumbtravel.com"
             })
         })
@@ -104,11 +101,11 @@ export default class LoginScreen extends Component {
                         </Text>
                     </View>
                     <Input
-                        onChangeText={(email) => this.setState({
-                            email: email.toLowerCase(),
-                            serverError: ''
-                        })}
-                        value={this.state.email.toLowerCase()}
+                        maxLength={254}
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        onChangeText={(email) => this.setState({ email: email.toLowerCase(), error: '' })}
+                        value={this.state.email}
                     />
 
                     <View>
@@ -117,15 +114,15 @@ export default class LoginScreen extends Component {
                         </Text>
                     </View>
                     <Input
+                        maxLength={30}
+                        autoCorrect={false}
+                        autoCapitalize="none"
                         secureTextEntry={true}
-                        onChangeText={(password) => this.setState({
-                            password: password,
-                            serverError: ''
-                        })}
+                        onChangeText={(password) => this.setState({ password, error: '' })}
                         value={this.state.password}
                     />
 
-                    <Button rounded success onPress={() => this.authenticateUser()} disabled={!this.canAuthenticateUser()} >
+                    <Button rounded success onPress={() => this.validate()} >
                         <Text>
                             LOG IN
                         </Text>
@@ -133,13 +130,7 @@ export default class LoginScreen extends Component {
 
                     <View>
                         <Text>
-                            {this.state.clientError}
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            {this.state.serverError}
+                            {this.state.error}
                         </Text>
                     </View>
 
