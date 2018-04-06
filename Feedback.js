@@ -70,19 +70,31 @@ export default class Feedback extends Component {
                         </Text>
                     </Button>
 
-                    <Button rounded info style={{ alignSelf: 'center' }}>
+                    <Button rounded info style={{ alignSelf: 'center' }}
+                        onPress={() => this.props.navigation.navigate('AskQuestion', { 
+                                showFeedbackSubmitMessage: this.showFeedbackSubmitMessage 
+                            }) }
+                    >
                         <Text>
                             Ask a question
                         </Text>
                     </Button>
 
-                    <Button rounded info style={{ alignSelf: 'center' }}>
+                    <Button rounded info style={{ alignSelf: 'center' }}
+                        onPress={() => this.props.navigation.navigate('RequestFeature', { 
+                                showFeedbackSubmitMessage: this.showFeedbackSubmitMessage 
+                            }) }
+                    >
                         <Text>
                             Request a feature
                         </Text>
                     </Button>
 
-                    <Button rounded info style={{ alignSelf: 'center' }}>
+                    <Button rounded info style={{ alignSelf: 'center' }}
+                        onPress={() => this.props.navigation.navigate('OtherFeedback', { 
+                                showFeedbackSubmitMessage: this.showFeedbackSubmitMessage 
+                            }) }
+                    >
                         <Text>
                             Other
                         </Text>

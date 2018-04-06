@@ -18,6 +18,9 @@ import Profile from './Profile';
 import EditProfile from './EditProfile';
 import Feedback from './Feedback';
 import ReportBug from './ReportBug';
+import AskQuestion from './AskQuestion';
+import RequestFeature from './RequestFeature';
+import OtherFeedback from './OtherFeedback';
 
 const SignedOutStack = StackNavigator({
     LaunchScreen: {
@@ -87,6 +90,24 @@ const ProfileStack = StackNavigator({
         screen: ReportBug,
         navigationOptions: {
             title: 'Report a bug',
+        }
+    },
+    AskQuestion: {
+        screen: AskQuestion,
+        navigationOptions: {
+            title: 'Ask a question',
+        }
+    },
+    RequestFeature: {
+        screen: RequestFeature,
+        navigationOptions: {
+            title: 'Request a feature',
+        }
+    },
+    OtherFeedback: {
+        screen: OtherFeedback,
+        navigationOptions: {
+            title: 'Give some other feedback',
         }
     },
 });

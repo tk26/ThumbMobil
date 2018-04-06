@@ -5,17 +5,17 @@ import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
 const initialState = {
-    bugDescription: '', clientError: '', serverError: ''
+    question: '', clientError: '', serverError: ''
 };
 
-export default class ReportBug extends Component {
+export default class AskQuestion extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
     }
 
-    validateBugReport() {
-        if(this.state.bugDescription.length < 1 || this.state.bugDescription.length > 400) {
+    validateQuestion() {
+        if(this.state.question.length < 1 || this.state.question.length > 400) {
             this.state.clientError = "Please describe in 1 to 400 characters";
             return false;
         }
@@ -24,7 +24,7 @@ export default class ReportBug extends Component {
         return true;
     }
 
-    submitBugReport() {
+    submitQuestion() {
         let responseStatus = 0;
         fetch(Config.API_URL+'/feedback/submit/', {
             method: 'POST',
@@ -33,8 +33,8 @@ export default class ReportBug extends Component {
                 'Authorization': 'Bearer' + ' ' + global.auth_token
             },
             body: JSON.stringify({
-                "feedbackType" : "bug",
-                "feedbackDescription": this.state.bugDescription
+                "feedbackType" : "question",
+                "feedbackDescription": this.state.question
             })
         })
         .then( response => {
@@ -80,7 +80,7 @@ export default class ReportBug extends Component {
                     />
                     <View>
                         <Text>
-                            Tell us about the bug you're experiencing...
+                            what question do you have...
                             {'\n'}
                         </Text>
                     </View>
@@ -96,20 +96,20 @@ export default class ReportBug extends Component {
 
                     <View>
                         <Text>
-                            YOUR EXPERIENCE
+                            YOUR QUESTION
                         </Text>
                     </View>
 
                     <TextInput
                         multiline={true}
                         numberOfLines={4}
-                        placeholder="The home feed has a different time zone."
-                        onChangeText={(bugDescription) => this.setState({ bugDescription })}
-                        value={this.state.bugDescription}
+                        placeholder="Where can I see my upcoming trips?"
+                        onChangeText={(question) => this.setState({ question })}
+                        value={this.state.question}
                     />
 
-                    <Button rounded success disabled={!this.validateBugReport()}
-                        onPress={() => this.submitBugReport()} >
+                    <Button rounded success disabled={!this.validateQuestion()}
+                        onPress={() => this.submitQuestion()} >
                         <Text>
                             SUBMIT
                         </Text>
