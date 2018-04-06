@@ -84,7 +84,7 @@ export default class SignupStep3 extends Component {
                 }
             })
             .catch(error => {
-                // TOOD log error
+                // TODO log error
                 this.setState({
                     error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
