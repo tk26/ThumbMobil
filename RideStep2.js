@@ -6,7 +6,7 @@ import moment from 'moment';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
 const initialState = {
-    travel_date: '', travel_time: [8, 16], clientError: ''
+    travel_date: '', travel_time: [8, 16], error: ''
 }
 
 export default class RideStep2 extends Component {
@@ -18,22 +18,30 @@ export default class RideStep2 extends Component {
     travel_timesChange = (values) => {
         this.setState({
             travel_time: values,
+            error: ''
         });
     }
 
-    canGoNext() {
-        if(this.state.travel_date === '') {
-            this.state.clientError = "Please select your travel date";
-            return false;
+    validate() {
+        if (this.state.travel_date === '') {
+            this.setState({ error: "Please select your travel date" });
+            return;
         }
 
-        if(this.state.travel_time[1] - this.state.travel_time[0] < 4) {
-            this.state.clientError = "Please select a time range of minimum 4 hours";
-            return false;
+        if (this.state.travel_time[1] - this.state.travel_time[0] < 4) {
+            this.setState({ error: "Please select a time range of minimum 4 hours" });
+            return;
         }
 
-        this.state.clientError = "";
-        return true;
+        // validation success
+        this.props.navigation.navigate('RideStep3', {
+            ride: {
+                start_address: this.props.navigation.state.params.ride.start_address,
+                end_address: this.props.navigation.state.params.ride.end_address,
+                travel_date: this.state.travel_date,
+                travel_time: this.state.travel_time,
+            }
+        });
     }
 
     render() {
@@ -43,7 +51,7 @@ export default class RideStep2 extends Component {
                     <Image
                         source={require('./assets/thumb-horizontal-logo.png')}
                     />
-                    
+
                     <View>
                         <Text>
                             {this.props.navigation.state.params.ride.start_address}
@@ -58,17 +66,17 @@ export default class RideStep2 extends Component {
                         </Text>
                     </View>
                     <DatePicker
-                            style={{width: 200}}
-                            date={this.state.travel_date}
-                            mode="date"
-                            placeholder="select travel date"
-                            format="MM-DD-YYYY"
-                            minDate={moment()}
-                            maxDate={moment().add(1, 'y')}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            onDateChange={(date) => {this.setState({travel_date: date})}}
-                        />
+                        style={{ width: 200 }}
+                        date={this.state.travel_date}
+                        mode="date"
+                        placeholder="select travel date"
+                        format="MM-DD-YYYY"
+                        minDate={new Date(moment())}
+                        maxDate={new Date(moment().add(1, 'y'))}
+                        confirmBtnText="Confirm"
+                        cancelBtnText="Cancel"
+                        onDateChange={(date) => { this.setState({ travel_date: date, error: '' }) }}
+                    />
 
                     <View>
                         <Text>
@@ -91,18 +99,7 @@ export default class RideStep2 extends Component {
                         />
                     </View>
 
-                    <Button rounded success
-                        onPress={() => {
-                            this.props.navigation.navigate('RideStep3', {
-                                ride: {
-                                    start_address: this.props.navigation.state.params.ride.start_address,
-                                    end_address: this.props.navigation.state.params.ride.end_address,
-                                    travel_date: this.state.travel_date,
-                                    travel_time: this.state.travel_time,
-                                }
-                            });
-                        }}
-                        disabled={ !this.canGoNext() }>
+                    <Button rounded success onPress={() => this.validate()}>
                         <Text>
                             NEXT
                         </Text>
@@ -110,7 +107,7 @@ export default class RideStep2 extends Component {
 
                     <View>
                         <Text>
-                            { this.state.clientError }
+                            {this.state.error}
                         </Text>
                     </View>
                 </Content>
@@ -120,19 +117,19 @@ export default class RideStep2 extends Component {
 }
 
 var styles = StyleSheet.create({
-  sliders: {
-    margin: 20,
-    width: 280,
-  },
-  text: {
-    alignSelf: 'center',
-    paddingVertical: 20,
-  },
-  title: {
-    fontSize: 30,
-  },
-  sliderOne: {
-    flexDirection: 'row',
-    justifyContent: 'space-around'
-  }
+    sliders: {
+        margin: 20,
+        width: 280,
+    },
+    text: {
+        alignSelf: 'center',
+        paddingVertical: 20,
+    },
+    title: {
+        fontSize: 30,
+    },
+    sliderOne: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    }
 });
