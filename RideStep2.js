@@ -91,7 +91,18 @@ export default class RideStep2 extends Component {
                         />
                     </View>
 
-                    <Button rounded success onPress={() => {}} disabled={ !this.canGoNext() }>
+                    <Button rounded success
+                        onPress={() => {
+                            this.props.navigation.navigate('RideStep3', {
+                                ride: {
+                                    start_address: this.props.navigation.state.params.ride.start_address,
+                                    end_address: this.props.navigation.state.params.ride.end_address,
+                                    travel_date: this.state.travel_date,
+                                    travel_time: this.state.travel_time,
+                                }
+                            });
+                        }}
+                        disabled={ !this.canGoNext() }>
                         <Text>
                             NEXT
                         </Text>
