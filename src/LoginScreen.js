@@ -87,7 +87,7 @@ export default class LoginScreen extends Component {
             <Container>
                 <Content>
                     <Image
-                        source={require('./assets/thumb-horizontal-logo.png')}
+                        source={require('./../assets/thumb-horizontal-logo.png')}
                     />
                     <View>
                         <Text>

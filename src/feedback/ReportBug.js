@@ -5,18 +5,18 @@ import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
 const initialState = {
-    feature: '', error: ''
+    bugDescription: '', error: ''
 };
 
-export default class RequestFeature extends Component {
+export default class ReportBug extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
     }
 
-    submitFeature() {
-        if (this.state.feature.length < 1) {
-            this.setState({ error: "Feature cannot be empty" });
+    submitBugReport() {
+        if (this.state.bugDescription.length < 1) {
+            this.setState({ error: "Bug description cannot be empty" });
             return;
         }
 
@@ -28,8 +28,8 @@ export default class RequestFeature extends Component {
                 'Authorization': 'Bearer' + ' ' + global.auth_token
             },
             body: JSON.stringify({
-                "feedbackType": "feature",
-                "feedbackDescription": this.state.feature
+                "feedbackType": "bug",
+                "feedbackDescription": this.state.bugDescription
             })
         })
             .then(response => {
@@ -71,11 +71,11 @@ export default class RequestFeature extends Component {
             <Container>
                 <Content>
                     <Image
-                        source={require('./assets/thumb-horizontal-logo.png')}
+                        source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
                     <View>
                         <Text>
-                            tell us about your feature idea...
+                            Tell us about the bug you're experiencing...
                             {'\n'}
                         </Text>
                     </View>
@@ -91,7 +91,7 @@ export default class RequestFeature extends Component {
 
                     <View>
                         <Text>
-                            YOUR SUGGESTION
+                            YOUR EXPERIENCE
                         </Text>
                     </View>
 
@@ -99,12 +99,12 @@ export default class RequestFeature extends Component {
                         maxLength={400}
                         multiline={true}
                         numberOfLines={4}
-                        placeholder="I would love to get push notifications"
-                        onChangeText={(feature) => this.setState({ feature })}
-                        value={this.state.feature}
+                        placeholder="The home feed has a different time zone."
+                        onChangeText={(bugDescription) => this.setState({ bugDescription })}
+                        value={this.state.bugDescription}
                     />
 
-                    <Button rounded success onPress={() => this.submitFeature()} >
+                    <Button rounded success onPress={() => this.submitBugReport()} >
                         <Text>
                             SUBMIT
                         </Text>

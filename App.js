@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { createRootNavigator } from './router';
-import { isLoggedIn } from './auth';
+import { createRootNavigator } from './src/router';
+import { isLoggedIn } from './src/auth';
 
 const initialState = {
     loggedIn: false,
