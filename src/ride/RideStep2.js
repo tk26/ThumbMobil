@@ -49,7 +49,7 @@ export default class RideStep2 extends Component {
             <Container>
                 <Content>
                     <Image
-                        source={require('./assets/thumb-horizontal-logo.png')}
+                        source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
 
                     <View>

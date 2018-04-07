@@ -18,7 +18,7 @@ export default class RideStep3 extends Component {
                 <Content>
                     {/*TODO: change to show user's profile picture*/}
                     <Image
-                        source={require('./assets/thumb-horizontal-logo.png')}
+                        source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
 
                     <View>

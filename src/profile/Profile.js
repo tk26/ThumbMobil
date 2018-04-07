@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Image, Linking, AsyncStorage } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
-import { onLogOut } from './auth';
+import { onLogOut } from './../auth';
 import { NavigationActions } from 'react-navigation';
 import Config from 'react-native-config';
 
@@ -65,7 +65,7 @@ export default class Profile extends Component {
             <Container>
                 <Content>
                     <Image
-                        source={require('./assets/thumb-horizontal-logo.png')}
+                        source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
 
                     <View>

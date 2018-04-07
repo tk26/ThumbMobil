@@ -5,65 +5,65 @@ import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
 const initialState = {
-    other: '', error: ''
+    question: '', error: ''
 };
 
-export default class OtherFeedback extends Component {
+export default class AskQuestion extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
     }
 
-    submitOther() {
-        if (this.state.other.length < 1) {
-            this.setState({ error: "Description cannot be empty" });
+    submitQuestion() {
+        if (this.state.question.length < 1) {
+            this.setState({ error: "Question cannot be empty" });
             return;
         }
 
         let responseStatus = 0;
-        fetch(Config.API_URL+'/feedback/submit/', {
+        fetch(Config.API_URL + '/feedback/submit/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer' + ' ' + global.auth_token
             },
             body: JSON.stringify({
-                "feedbackType" : "other",
-                "feedbackDescription": this.state.other
+                "feedbackType": "question",
+                "feedbackDescription": this.state.question
             })
         })
-        .then( response => {
-            responseStatus = response.status
-            return response.json()
-        })
-        .then( response => {
-            if(responseStatus == 400) {
+            .then(response => {
+                responseStatus = response.status
+                return response.json()
+            })
+            .then(response => {
+                if (responseStatus == 400) {
+                    this.setState({
+                        error: "Invalid user details"
+                    })
+                }
+                else if (responseStatus == 200) {
+                    // go back to Feedback Screen and show the message there
+                    this.props.navigation.state.params.showFeedbackSubmitMessage(response.message);
+                    const backAction = NavigationActions.back({
+                        key: null
+                    });
+                    this.props.navigation.dispatch(backAction);
+                }
+                else {
+                    this.setState({
+                        error: "Some error occured. Please try again. If problem persists, " +
+                        "please let us know at support@thumbtravel.com"
+                    })
+                }
+            })
+            .catch(error => {
+                // TODO log error
                 this.setState({
-                    error: "Invalid user details"
-                })
-            }
-            else if(responseStatus == 200) {
-                // go back to Feedback Screen and show the message there
-                this.props.navigation.state.params.showFeedbackSubmitMessage(response.message);
-                const backAction = NavigationActions.back({
-                    key: null
-                });
-                this.props.navigation.dispatch(backAction);
-            }
-            else {
-                this.setState({
-                    error: "Some error occured. Please try again. If problem persists, " + 
+                    error: "Some error occured. Please try again. If problem persists, " +
                     "please let us know at support@thumbtravel.com"
                 })
-            }
-        })
-        .catch( error => {
-            // TODO log error
-            this.setState({
-                error: "Some error occured. Please try again. If problem persists, " + 
-                "please let us know at support@thumbtravel.com"
             })
-        })
     }
 
     render() {
@@ -71,11 +71,11 @@ export default class OtherFeedback extends Component {
             <Container>
                 <Content>
                     <Image
-                        source={require('./assets/thumb-horizontal-logo.png')}
+                        source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
                     <View>
                         <Text>
-                            is there something else we can help you with...
+                            what question do you have...
                             {'\n'}
                         </Text>
                     </View>
@@ -91,7 +91,7 @@ export default class OtherFeedback extends Component {
 
                     <View>
                         <Text>
-                            YOUR CONCERN
+                            YOUR QUESTION
                         </Text>
                     </View>
 
@@ -99,20 +99,20 @@ export default class OtherFeedback extends Component {
                         maxLength={400}
                         multiline={true}
                         numberOfLines={4}
-                        placeholder="thumb has changed my life"
-                        onChangeText={(other) => this.setState({ other })}
-                        value={this.state.other}
+                        placeholder="Where can I see my upcoming trips?"
+                        onChangeText={(question) => this.setState({ question, error: '' })}
+                        value={this.state.question}
                     />
 
-                    <Button rounded success onPress={() => this.submitOther()} >
+                    <Button rounded success onPress={() => this.submitQuestion()}>
                         <Text>
                             SUBMIT
                         </Text>
                     </Button>
-                    
+
                     <View>
                         <Text>
-                            { this.state.error }
+                            {this.state.error}
                         </Text>
                     </View>
                 </Content>

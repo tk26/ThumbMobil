@@ -2,26 +2,31 @@ import React, { Component } from 'react';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 
 import LaunchScreen from './LaunchScreen';
-import SignupStep1 from './SignupStep1';
-import SignupStep2 from './SignupStep2';
-import SignupStep3 from './SignupStep3';
-import SignupStep4 from './SignupStep4';
-import SignupSuccess from './SignupSuccess';
 import LoginScreen from './LoginScreen';
 
-import Home from './Home';
-import Travel from './Travel';
-import RideStep1 from './RideStep1';
-import RideStep2 from './RideStep2';
-import RideStep3 from './RideStep3';
-import DriveStep1 from './DriveStep1';
-import Profile from './Profile';
-import EditProfile from './EditProfile';
-import Feedback from './Feedback';
-import ReportBug from './ReportBug';
-import AskQuestion from './AskQuestion';
-import RequestFeature from './RequestFeature';
-import OtherFeedback from './OtherFeedback';
+import SignupStep1 from './signup/SignupStep1';
+import SignupStep2 from './signup/SignupStep2';
+import SignupStep3 from './signup/SignupStep3';
+import SignupStep4 from './signup/SignupStep4';
+import SignupSuccess from './signup/SignupSuccess';
+
+import Home from './home/Home';
+import Travel from './travel/Travel';
+
+import RideStep1 from './ride/RideStep1';
+import RideStep2 from './ride/RideStep2';
+import RideStep3 from './ride/RideStep3';
+
+import DriveStep1 from './drive/DriveStep1';
+
+import Profile from './profile/Profile';
+import EditProfile from './profile/EditProfile';
+
+import Feedback from './feedback/Feedback';
+import ReportBug from './feedback/ReportBug';
+import AskQuestion from './feedback/AskQuestion';
+import RequestFeature from './feedback/RequestFeature';
+import OtherFeedback from './feedback/OtherFeedback';
 
 const SignedOutStack = StackNavigator({
     LaunchScreen: {

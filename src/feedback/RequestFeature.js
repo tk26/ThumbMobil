@@ -5,18 +5,18 @@ import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
 
 const initialState = {
-    bugDescription: '', error: ''
+    feature: '', error: ''
 };
 
-export default class ReportBug extends Component {
+export default class RequestFeature extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
     }
 
-    submitBugReport() {
-        if (this.state.bugDescription.length < 1) {
-            this.setState({ error: "Bug description cannot be empty" });
+    submitFeature() {
+        if (this.state.feature.length < 1) {
+            this.setState({ error: "Feature cannot be empty" });
             return;
         }
 
@@ -28,8 +28,8 @@ export default class ReportBug extends Component {
                 'Authorization': 'Bearer' + ' ' + global.auth_token
             },
             body: JSON.stringify({
-                "feedbackType": "bug",
-                "feedbackDescription": this.state.bugDescription
+                "feedbackType": "feature",
+                "feedbackDescription": this.state.feature
             })
         })
             .then(response => {
@@ -71,11 +71,11 @@ export default class ReportBug extends Component {
             <Container>
                 <Content>
                     <Image
-                        source={require('./assets/thumb-horizontal-logo.png')}
+                        source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
                     <View>
                         <Text>
-                            Tell us about the bug you're experiencing...
+                            tell us about your feature idea...
                             {'\n'}
                         </Text>
                     </View>
@@ -91,7 +91,7 @@ export default class ReportBug extends Component {
 
                     <View>
                         <Text>
-                            YOUR EXPERIENCE
+                            YOUR SUGGESTION
                         </Text>
                     </View>
 
@@ -99,12 +99,12 @@ export default class ReportBug extends Component {
                         maxLength={400}
                         multiline={true}
                         numberOfLines={4}
-                        placeholder="The home feed has a different time zone."
-                        onChangeText={(bugDescription) => this.setState({ bugDescription })}
-                        value={this.state.bugDescription}
+                        placeholder="I would love to get push notifications"
+                        onChangeText={(feature) => this.setState({ feature })}
+                        value={this.state.feature}
                     />
 
-                    <Button rounded success onPress={() => this.submitBugReport()} >
+                    <Button rounded success onPress={() => this.submitFeature()} >
                         <Text>
                             SUBMIT
                         </Text>
