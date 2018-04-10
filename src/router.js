@@ -11,11 +11,13 @@ import SignupStep4 from './signup/SignupStep4';
 import SignupSuccess from './signup/SignupSuccess';
 
 import Home from './home/Home';
+import Thumb from './thumb/Thumb';
 import Travel from './travel/Travel';
 
 import RideStep1 from './ride/RideStep1';
 import RideStep2 from './ride/RideStep2';
 import RideStep3 from './ride/RideStep3';
+import RideStep4 from './ride/RideStep4';
 
 import DriveStep1 from './drive/DriveStep1';
 
@@ -143,6 +145,12 @@ const TravelStack = StackNavigator({
             title: 'Ride: Step 3',
         }
     },
+    RideStep4: {
+        screen: RideStep4,
+        navigationOptions: {
+            title: 'Ride: Step 4',
+        }
+    },
     DriveStep1: {
         screen: DriveStep1,
         navigationOptions: {
@@ -156,6 +164,12 @@ const LoggedInTabs = TabNavigator({
         screen: Home,
         navigationOptions: {
             tabBarLabel: 'Home'
+        }
+    },
+    Thumb: {
+        screen: Thumb,
+        navigationOptions: {
+            tabBarLabel: 'Thumb'
         }
     },
     Travel: {
