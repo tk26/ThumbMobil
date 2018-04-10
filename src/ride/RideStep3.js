@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
-import { Image, Linking, TextInput } from 'react-native';
+import { Image, Linking } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
-
-const initialState = {
-    pickupNotes: ''
-}
 
 export default class RideStep3 extends Component {
     constructor(props) {
         super(props);
-        this.state = initialState;
+        alert(JSON.stringify(this.props.navigation.state.params.ride));
     }
 
     render() {
@@ -23,22 +19,13 @@ export default class RideStep3 extends Component {
 
                     <View>
                         <Text>
-                            PICK UP NOTES
+                            Ride - Step 3
                         </Text>
                     </View>
 
-                    <TextInput
-                        maxLength={100}
-                        multiline={true}
-                        numberOfLines={4}
-                        placeholder="this will be shared with your driver"
-                        onChangeText={(pickupNotes) => this.setState({ pickupNotes })}
-                        value={this.state.pickupNotes}
-                    />
-
                     <Button rounded success>
                         <Text>
-                            SUBMIT
+                            NEXT
                         </Text>
                     </Button>
                 </Content>

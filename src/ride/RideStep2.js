@@ -6,7 +6,7 @@ import moment from 'moment';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
 const initialState = {
-    travel_date: '', travel_time: [8, 16], error: ''
+    travelDate: '', travelTime: [8, 16], error: ''
 }
 
 export default class RideStep2 extends Component {
@@ -15,20 +15,20 @@ export default class RideStep2 extends Component {
         this.state = initialState;
     }
 
-    travel_timesChange = (values) => {
+    travelTimesChange = (values) => {
         this.setState({
-            travel_time: values,
+            travelTime: values,
             error: ''
         });
     }
 
     validate() {
-        if (this.state.travel_date === '') {
+        if (this.state.travelDate === '') {
             this.setState({ error: "Please select your travel date" });
             return;
         }
 
-        if (this.state.travel_time[1] - this.state.travel_time[0] < 4) {
+        if (this.state.travelTime[1] - this.state.travelTime[0] < 4) {
             this.setState({ error: "Please select a time range of minimum 4 hours" });
             return;
         }
@@ -36,10 +36,11 @@ export default class RideStep2 extends Component {
         // validation success
         this.props.navigation.navigate('RideStep3', {
             ride: {
-                start_address: this.props.navigation.state.params.ride.start_address,
-                end_address: this.props.navigation.state.params.ride.end_address,
-                travel_date: this.state.travel_date,
-                travel_time: this.state.travel_time,
+                startAddress: this.props.navigation.state.params.ride.startAddress,
+                endAddress: this.props.navigation.state.params.ride.endAddress,
+                pickupNotes: this.props.navigation.state.params.ride.pickupNotes,
+                travelDate: this.state.travelDate,
+                travelTime: this.state.travelTime,
             }
         });
     }
@@ -48,15 +49,18 @@ export default class RideStep2 extends Component {
         return (
             <Container>
                 <Content>
+                    {/*TODO: change to show user's profile picture*/}
                     <Image
                         source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
 
                     <View>
                         <Text>
-                            {this.props.navigation.state.params.ride.start_address}
+                            {this.props.navigation.state.params.ride.startAddress}
                             {'\n'}
-                            {this.props.navigation.state.params.ride.end_address}
+                            {this.props.navigation.state.params.ride.endAddress}
+                            {'\n'}
+                            {this.props.navigation.state.params.ride.pickupNotes}
                         </Text>
                     </View>
 
@@ -67,7 +71,7 @@ export default class RideStep2 extends Component {
                     </View>
                     <DatePicker
                         style={{ width: 200 }}
-                        date={this.state.travel_date}
+                        date={this.state.travelDate}
                         mode="date"
                         placeholder="select travel date"
                         format="MM-DD-YYYY"
@@ -75,7 +79,7 @@ export default class RideStep2 extends Component {
                         maxDate={new Date(moment().add(1, 'y'))}
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"
-                        onDateChange={(date) => { this.setState({ travel_date: date, error: '' }) }}
+                        onDateChange={(date) => { this.setState({ travelDate: date, error: '' }) }}
                     />
 
                     <View>
@@ -86,13 +90,13 @@ export default class RideStep2 extends Component {
 
                     <View style={styles.sliders}>
                         <View style={styles.sliderOne}>
-                            <Text style={styles.text}>{this.state.travel_time[0]}:00 </Text>
-                            <Text style={styles.text}>{this.state.travel_time[1]}:00</Text>
+                            <Text style={styles.text}>{this.state.travelTime[0]}:00 </Text>
+                            <Text style={styles.text}>{this.state.travelTime[1]}:00</Text>
                         </View>
                         <MultiSlider
-                            values={[this.state.travel_time[0], this.state.travel_time[1]]}
+                            values={[this.state.travelTime[0], this.state.travelTime[1]]}
                             sliderLength={280}
-                            onValuesChange={this.travel_timesChange}
+                            onValuesChange={this.travelTimesChange}
                             min={0}
                             max={24}
                             step={1}
