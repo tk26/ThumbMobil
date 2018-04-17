@@ -15,13 +15,15 @@ export default class RideStep4 extends Component {
                 <Content>
                     <View>
                         <Text>
-                            {ride.startAddress}
+                            {ride.startLocation.address}
                             {'\n'}
-                            {ride.endAddress}
+                            {ride.endLocation.address}
                             {'\n'}
                             {ride.travelDate}
                             {'\n'}
                             {ride.travelTime[0]}:00 to {ride.travelTime[1]}:00
+                            {'\n'}
+                            {ride.pickupNotes}
                         </Text>
                     </View>
                 

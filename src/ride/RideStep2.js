@@ -36,8 +36,8 @@ export default class RideStep2 extends Component {
         // validation success
         this.props.navigation.navigate('RideStep3', {
             ride: {
-                startAddress: this.props.navigation.state.params.ride.startAddress,
-                endAddress: this.props.navigation.state.params.ride.endAddress,
+                startLocation: this.props.navigation.state.params.ride.startLocation,
+                endLocation: this.props.navigation.state.params.ride.endLocation,
                 pickupNotes: this.props.navigation.state.params.ride.pickupNotes,
                 travelDate: this.state.travelDate,
                 travelTime: this.state.travelTime,
@@ -56,9 +56,9 @@ export default class RideStep2 extends Component {
 
                     <View>
                         <Text>
-                            {this.props.navigation.state.params.ride.startAddress}
+                            {this.props.navigation.state.params.ride.startLocation.address}
                             {'\n'}
-                            {this.props.navigation.state.params.ride.endAddress}
+                            {this.props.navigation.state.params.ride.endLocation.address}
                             {'\n'}
                             {this.props.navigation.state.params.ride.pickupNotes}
                         </Text>

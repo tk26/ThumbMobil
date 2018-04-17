@@ -1,10 +1,71 @@
 import React, { Component } from 'react';
 import { Image, Linking } from 'react-native';
 import { Container, Content, View, Text, Button, Input } from 'native-base';
+import Config from 'react-native-config';
+import { NavigationActions } from 'react-navigation';
 
 export default class RideStep3 extends Component {
     constructor(props) {
         super(props);
+        this.state = this.props.navigation.state.params;
+        this.state.error = '';
+    }
+
+    submitRide() {
+        let responseStatus = 0;
+        fetch(Config.API_URL + '/ride/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer' + ' ' + global.auth_token
+            },
+            body: JSON.stringify({
+                "startLocation": this.state.ride.startLocation,
+                "endLocation": this.state.ride.endLocation,
+                "pickupNotes": this.state.ride.pickupNotes,
+                "travelDate": this.state.ride.travelDate,
+                "travelTime": this.state.ride.travelTime[0] + "-" + this.state.ride.travelTime[1]
+            })
+        })
+            .then(response => {
+                responseStatus = response.status;
+                return response.json()
+            })
+            .then(response => {
+                if (responseStatus == 400) {
+                    this.setState({
+                        error: "Missing one or more ride details"
+                    })
+                }
+                else if (responseStatus == 200) {
+                    const resetAction = NavigationActions.reset({
+                        index: 1,
+                        actions: [
+                            NavigationActions.navigate({ routeName: 'Travel'}),
+                            NavigationActions.navigate({ 
+                                routeName: 'RideStep4',
+                                params: {
+                                    ride: this.state.ride
+                                }
+                            })
+                        ],
+                    });
+                    this.props.navigation.dispatch(resetAction);
+                }
+                else {
+                    this.setState({
+                        error: "Some error occured. Please try again. If problem persists, " +
+                        "please let us know at support@thumbtravel.com"
+                    })
+                }
+            })
+            .catch(error => {
+                // TODO log error
+                this.setState({
+                    error: "Some error occured. Please try again. If problem persists, " +
+                    "please let us know at support@thumbtravel.com"
+                })
+            })
     }
 
     render() {
@@ -14,13 +75,15 @@ export default class RideStep3 extends Component {
                 <Content>
                     <View>
                         <Text>
-                            {ride.startAddress}
+                            {ride.startLocation.address}
                             {'\n'}
-                            {ride.endAddress}
+                            {ride.endLocation.address}
                             {'\n'}
                             {ride.travelDate}
                             {'\n'}
                             {ride.travelTime[0]}:00 to {ride.travelTime[1]}:00
+                            {'\n'}
+                            {ride.pickupNotes}
                         </Text>
                     </View>
                 
@@ -57,15 +120,18 @@ export default class RideStep3 extends Component {
                     </View>
                 
                     <Button rounded success onPress={() => {
-                        // TODO call endpoint and save the ride    
-                        this.props.navigation.navigate('RideStep4', {
-                            ride: ride
-                        });
+                        this.submitRide();
                     }}>
                         <Text>
                             NEXT
                         </Text>
                     </Button>
+
+                    <View>
+                        <Text>
+                            {this.state.error}
+                        </Text>
+                    </View>
                 </Content>
             </Container>
         );

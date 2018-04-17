@@ -4,7 +4,7 @@ import { Container, Content, View, Text, Button, Input, Picker } from 'native-ba
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 const initialState = {
-    startAddress: '', endAddress: '', pickupNotes: '', error: '',
+    startLocation: {}, endLocation: {}, pickupNotes: '', error: '',
 };
 
 export default class RideStep1 extends Component {
@@ -14,21 +14,25 @@ export default class RideStep1 extends Component {
     }
 
     validate() {
-        if (this.state.startAddress.length < 1) {
-            this.setState({ error: "Start address cannot be empty" });
+        if (!this.state.startLocation.address ||
+            !this.state.startLocation.latitude ||
+            !this.state.startLocation.longitude) {
+            this.setState({ error: "Please select a start address" });
             return;
         }
 
-        if (this.state.endAddress.length < 1) {
-            this.setState({ error: "End address cannot be empty" });
+        if (!this.state.endLocation.address ||
+            !this.state.endLocation.latitude ||
+            !this.state.endLocation.longitude) {
+            this.setState({ error: "Please select an end address" });
             return;
         }
 
         // validation success
         this.props.navigation.navigate('RideStep2', {
             ride: {
-                startAddress: this.state.startAddress,
-                endAddress: this.state.endAddress,
+                startLocation: this.state.startLocation,
+                endLocation: this.state.endLocation,
                 pickupNotes: this.state.pickupNotes
             }
         });
@@ -58,11 +62,17 @@ export default class RideStep1 extends Component {
                         fetchDetails={true}
                         renderDescription={row => row.description} // custom description render
                         onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                            this.setState({ startAddress: data.description, error: '' });
+                            this.setState({ 
+                                startLocation: {
+                                    address: data.description,
+                                    latitude: details.geometry.location.lat,
+                                    longitude: details.geometry.location.lng
+                                }, 
+                                error: '' 
+                            });
                         }}
-
-                        onChangeText={(startAddress) => this.setState({ startAddress, error: '' })}
-                        value={this.state.startAddress}
+                        
+                        value={this.state.startLocation.address}
 
                         getDefaultValue={() => ''}
 
@@ -87,6 +97,9 @@ export default class RideStep1 extends Component {
                         currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
                         currentLocationLabel="Current location"
                         nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+                        GoogleReverseGeocodingQuery={{
+                            // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+                        }}
                         debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
                     />
 
@@ -99,11 +112,17 @@ export default class RideStep1 extends Component {
                         fetchDetails={true}
                         renderDescription={row => row.description} // custom description render
                         onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                            this.setState({ endAddress: data.description, error: '' });
+                            this.setState({ 
+                                endLocation: {
+                                    address: data.description,
+                                    latitude: details.geometry.location.lat,
+                                    longitude: details.geometry.location.lng
+                                }, 
+                                error: '' 
+                            });
                         }}
 
-                        onChangeText={(endAddress) => this.setState({ endAddress, error: '' })}
-                        value={this.state.endAddress}
+                        value={this.state.endLocation.address}
 
                         getDefaultValue={() => ''}
 
@@ -126,6 +145,9 @@ export default class RideStep1 extends Component {
                             }
                         }}
                         nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+                        GoogleReverseGeocodingQuery={{
+                            // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+                        }}
                         debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
                     />
 
