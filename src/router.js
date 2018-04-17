@@ -20,6 +20,9 @@ import RideStep3 from './ride/RideStep3';
 import RideStep4 from './ride/RideStep4';
 
 import DriveStep1 from './drive/DriveStep1';
+import DriveStep2 from './drive/DriveStep2';
+import DriveStep3 from './drive/DriveStep3';
+import DriveStep4 from './drive/DriveStep4';
 
 import Profile from './profile/Profile';
 import EditProfile from './profile/EditProfile';
@@ -155,6 +158,24 @@ const TravelStack = StackNavigator({
         screen: DriveStep1,
         navigationOptions: {
             title: 'Drive: Step 1',
+        }
+    },
+    DriveStep2: {
+        screen: DriveStep2,
+        navigationOptions: {
+            title: 'Drive: Step 2',
+        }
+    },
+    DriveStep3: {
+        screen: DriveStep3,
+        navigationOptions: {
+            title: 'Drive: Step 3',
+        }
+    },
+    DriveStep4: {
+        screen: DriveStep4,
+        navigationOptions: {
+            title: 'Drive: Step 4',
         }
     },
 });
