@@ -24,7 +24,7 @@ export default class DriveStep3 extends Component {
                 "endLocation": this.state.drive.endLocation,
                 "availableSeats": this.state.drive.availableSeats,
                 "travelDate": this.state.drive.travelDate,
-                "travelTime": this.state.drive.travelTime[0] + "-" + this.state.drive.travelTime[1]
+                "travelTime": this.state.drive.travelTime
             })
         })
             .then(response => {

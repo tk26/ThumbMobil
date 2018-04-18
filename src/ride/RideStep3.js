@@ -24,7 +24,7 @@ export default class RideStep3 extends Component {
                 "endLocation": this.state.ride.endLocation,
                 "pickupNotes": this.state.ride.pickupNotes,
                 "travelDate": this.state.ride.travelDate,
-                "travelTime": this.state.ride.travelTime[0] + "-" + this.state.ride.travelTime[1]
+                "travelTime": this.state.ride.travelTime
             })
         })
             .then(response => {
