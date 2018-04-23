@@ -24,6 +24,9 @@ export default class RideStep4 extends Component {
                             {ride.travelTime[0]}:00 to {ride.travelTime[1]}:00
                             {'\n'}
                             {ride.pickupNotes}
+                            {'\n'}
+                            {ride.travelDescription}
+                            {'\n'}
                         </Text>
                     </View>
                 

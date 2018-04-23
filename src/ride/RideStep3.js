@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Linking } from 'react-native';
+import { Image, Linking, TextInput } from 'react-native';
 import { Container, Content, View, Text, Button, Input } from 'native-base';
 import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
@@ -9,9 +9,16 @@ export default class RideStep3 extends Component {
         super(props);
         this.state = this.props.navigation.state.params;
         this.state.error = '';
+        this.state.travelDescription = '';
     }
 
     submitRide() {
+        if (this.state.travelDescription === '') {
+            this.setState({ error: "Please add a travel description" });
+            return;
+        }
+        
+        this.state.ride.travelDescription = this.state.travelDescription;
         let responseStatus = 0;
         fetch(Config.API_URL + '/ride/create', {
             method: 'POST',
@@ -24,7 +31,8 @@ export default class RideStep3 extends Component {
                 "endLocation": this.state.ride.endLocation,
                 "pickupNotes": this.state.ride.pickupNotes,
                 "travelDate": this.state.ride.travelDate,
-                "travelTime": this.state.ride.travelTime
+                "travelTime": this.state.ride.travelTime,
+                "travelDescription": this.state.ride.travelDescription
             })
         })
             .then(response => {
@@ -91,11 +99,14 @@ export default class RideStep3 extends Component {
                         source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
                     
-                    <View>
-                        <Text>
-                            Tell everyone what you're up to on your trip...
-                        </Text>
-                    </View>
+                    <TextInput
+                        maxLength={100}
+                        multiline={true}
+                        numberOfLines={4}
+                        placeholder="describe your travel"
+                        onChangeText={(travelDescription) => this.setState({ travelDescription })}
+                        value={this.state.travelDescription}
+                    />
 
                     <Button small rounded info>
                         <Text>

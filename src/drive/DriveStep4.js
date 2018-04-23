@@ -25,6 +25,8 @@ export default class DriveStep4 extends Component {
                             {'\n'}
                             {drive.travelTime[0]}:00 to {drive.travelTime[1]}:00
                             {'\n'}
+                            {drive.travelDescription}
+                            {'\n'}
                         </Text>
                     </View>
 

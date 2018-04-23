@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Linking } from 'react-native';
+import { Image, Linking, TextInput } from 'react-native';
 import { Container, Content, View, Text, Button, Input } from 'native-base';
 import Config from 'react-native-config';
 import { NavigationActions } from 'react-navigation';
@@ -9,9 +9,16 @@ export default class DriveStep3 extends Component {
         super(props);
         this.state = this.props.navigation.state.params;
         this.state.error = '';
+        this.state.travelDescription = '';
     }
-
+    
     submitDrive() {
+        if (this.state.travelDescription === '') {
+            this.setState({ error: "Please add a travel description" });
+            return;
+        }
+
+        this.state.drive.travelDescription = this.state.travelDescription;
         let responseStatus = 0;
         fetch(Config.API_URL + '/drive/create', {
             method: 'POST',
@@ -24,7 +31,8 @@ export default class DriveStep3 extends Component {
                 "endLocation": this.state.drive.endLocation,
                 "availableSeats": this.state.drive.availableSeats,
                 "travelDate": this.state.drive.travelDate,
-                "travelTime": this.state.drive.travelTime
+                "travelTime": this.state.drive.travelTime,
+                "travelDescription": this.state.drive.travelDescription
             })
         })
             .then(response => {
@@ -90,12 +98,15 @@ export default class DriveStep3 extends Component {
                     <Image
                         source={require('./../../assets/thumb-horizontal-logo.png')}
                     />
-                    
-                    <View>
-                        <Text>
-                            Tell everyone what you're up to on your trip...
-                        </Text>
-                    </View>
+
+                    <TextInput
+                        maxLength={100}
+                        multiline={true}
+                        numberOfLines={4}
+                        placeholder="describe your travel"
+                        onChangeText={(travelDescription) => this.setState({ travelDescription })}
+                        value={this.state.travelDescription}
+                    />
 
                     <Button small rounded info>
                         <Text>
@@ -126,6 +137,12 @@ export default class DriveStep3 extends Component {
                             NEXT
                         </Text>
                     </Button>
+
+                    <View>
+                        <Text>
+                            {this.state.error}
+                        </Text>
+                    </View>
                 </Content>
             </Container>
         );
