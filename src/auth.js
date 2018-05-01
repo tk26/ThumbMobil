@@ -12,7 +12,20 @@ export const isLoggedIn = () => {
             .then(token => {
                 if (token !== null) {
                     global.auth_token = JSON.parse(token);
-                    resolve(true);
+                    AsyncStorage.getItem("user")
+                        .then(user => {
+                            if (user !== null) {
+                                user = JSON.parse(user);
+                                global.firstName = user.firstName;
+                                global.username = user.username;
+                                global.profilePicture = user.profilePicture;
+                                resolve(true);
+                            }
+                            else {
+                                resolve(false);                                
+                            }
+                        });
+                    // resolve(true);
                 } else {
                     resolve(false);
                 }

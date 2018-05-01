@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Linking } from 'react-native';
+import { Image, Linking, AsyncStorage } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
 import Config from 'react-native-config';
 import { onLogIn } from './auth';
@@ -64,6 +64,20 @@ export default class LoginScreen extends Component {
                 onLogIn(JSON.stringify(response.token))
                     .then(() => {
                         global.auth_token = response.token; // hack to make it work in first login run
+                        global.firstName = response.firstName;
+                        global.username = response.username;
+                        global.profilePicture = response.profilePicture;
+                        // Save user details
+                        let user = {
+                            firstName: response.firstName,
+                            lastName: response.lastName,
+                            school: response.school,
+                            username: response.username,
+                            profilePicture: response.profilePicture,
+                            birthday: response.birthday,
+                            bio: response.bio
+                        }
+                        AsyncStorage.setItem("user", JSON.stringify(user));
                         this.props.navigation.navigate('LoggedInTabs');
                     })
             }

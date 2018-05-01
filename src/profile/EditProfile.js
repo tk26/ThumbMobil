@@ -1,27 +1,41 @@
 import React, { Component } from 'react';
-import { Image, Linking, AsyncStorage } from 'react-native';
+import { Image, Linking, AsyncStorage, TouchableOpacity } from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
 import { NavigationActions } from 'react-navigation';
 import Config from 'react-native-config';
 
+const headerPhotoMap = {
+    // TODO point to header photo sources
+    "indiana-university": ""
+}
+
 export default class EditProfile extends Component {
     constructor(props) {
         super(props);
-        this.state = this.props.navigation.state.params.user;
-        this.state.error = '';
+    }
+
+    componentWillMount() {
+        this.setState({
+            firstName: global.firstName,
+            username: global.username,
+            profilePicture: global.profilePicture,
+            error: ''
+        });
+    }
+
+    componentDidMount() {
+        AsyncStorage.getItem("user")
+            .then(user => {
+                user = JSON.parse(user);
+                this.setState({
+                    headerPhoto: headerPhotoMap[user.school] || "",
+                    school: user.school,
+                    bio: user.bio
+                });
+            });
     }
 
     validateAndUpdate() {
-        // client side validation
-        if (this.state.firstName.length < 1) {
-            this.setState({ error: "First Name cannot be empty" });
-            return;
-        }
-        if (this.state.lastName.length < 1) {
-            this.setState({ error: "Last Name cannot be empty" });
-            return;
-        }
-
         // server side validation
         let responseStatus = 0;
         fetch(Config.API_URL+'/user/edit/', {
@@ -31,8 +45,8 @@ export default class EditProfile extends Component {
                 'Authorization': 'Bearer' + ' ' + global.auth_token
             },
             body: JSON.stringify({
-                "firstName" : this.state.firstName,
-                "lastName": this.state.lastName
+                "profilePicture" : this.state.profilePicture,
+                "bio": this.state.bio
             })
         })
         .then( response => {
@@ -50,7 +64,7 @@ export default class EditProfile extends Component {
                 this.setState({
                     error: response.message
                 })
-                this.props.navigation.state.params.refresh(this.state.firstName, this.state.lastName);
+                this.props.navigation.state.params.refresh(this.state.profilePicture);
             }
             else {
                 this.setState({
@@ -72,43 +86,23 @@ export default class EditProfile extends Component {
         return (
             <Container>
                 <Content>
-                    <Image
-                        source={require('./../../assets/thumb-horizontal-logo.png')}
-                    />
+                    <View>
+                        <Image
+                            source={ this.state.headerPhoto || require('./../../assets/thumb-horizontal-logo.png') }
+                        />
+                    </View>
 
                     <View>
                         <Text>
-                            First Name:
+                            First Name: {this.state.firstName}
                         </Text>
                     </View>
 
-                    <Input
-                        maxLength={30}
-                        autoCorrect={false}
-                        autoCapitalize="words"
-                        onChangeText={(firstName) => this.setState({firstName, error: ''})}
-                        value={this.state.firstName}
-                    />
-
-                    <View>
-                        <Text>
-                            Last Name:
-                        </Text>
-                    </View>
-
-                    <Input
-                        maxLength={30}
-                        autoCorrect={false}
-                        autoCapitalize="words"
-                        onChangeText={(lastName) => this.setState({lastName, error: ''})}
-                        value={this.state.lastName}
-                    />
-
-                    <View>
-                        <Text>
-                            School: {this.state.school}
-                        </Text>
-                    </View>
+                    <TouchableOpacity>
+                        <Image
+                            source={ this.state.profilePicture || require('./../../assets/thumb-horizontal-logo.png') }
+                        />
+                    </TouchableOpacity>
 
                     <View>
                         <Text>
@@ -118,9 +112,23 @@ export default class EditProfile extends Component {
 
                     <View>
                         <Text>
-                            Profile Picture: {this.state.profilePicture}
+                            School: {this.state.school}
                         </Text>
                     </View>
+
+                    <View>
+                        <Text>
+                            Bio:
+                        </Text>
+                    </View>
+
+                    <Input
+                        maxLength={100}
+                        autoCorrect={true}
+                        onChangeText={(bio) => this.setState({bio, error:''})}
+                        placeholder="Yo, add a bio"
+                        value={this.state.bio}
+                    />
 
                     <Button rounded success onPress={() => this.validateAndUpdate()}>
                         <Text>

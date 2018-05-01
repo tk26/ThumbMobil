@@ -1,102 +1,50 @@
 import React, { Component } from 'react';
-import { Image, Linking, AsyncStorage } from 'react-native';
+import { Image, Linking, AsyncStorage, TouchableOpacity} from 'react-native';
 import { Container, Content, View, Text, Button, Input, Picker } from 'native-base';
 import { onLogOut } from './../auth';
 import { NavigationActions } from 'react-navigation';
 import Config from 'react-native-config';
 
 const initialState = {
-    firstName: '', lastName: '', school: '',
-    username: '', profilePicture: '', error: ''
+    firstName: '', profilePicture: '', error: ''
 };
 
 export default class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = initialState;
-        this.fetchUserProfile();
     }
 
-    fetchUserProfile() {
-        let responseStatus = 0;
-        fetch(Config.API_URL + '/user/profile', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer' + ' ' + global.auth_token
-            }
-        }).then( response => {
-            responseStatus = response.status;
-            return response.json();
-        }).then( response => {
-            if (responseStatus == 403) {
-                this.setState({
-                    error: "Some error occured. Please try again. If problem persists, " +
-                    "please let us know at support@thumbtravel.com"
-                })
-            }
-            else if (responseStatus == 200) {
-                this.setState({
-                    firstName: response.firstName,
-                    lastName: response.lastName,
-                    school: response.school,
-                    username: response.username,
-                    profilePicture: response.profilePicture || ''
-                })
-            }
-        }).catch(error => {
-            // TODO log error
-            this.setState({
-                error: "Some error occured. Please try again. If problem persists, " +
-                "please let us know at support@thumbtravel.com"
-            })
-        })
-    }
-
-    refreshUserProfile = (firstName, lastName) => {
+    componentDidMount() {
         this.setState({
-            firstName: firstName,
-            lastName: lastName
-        })
+            firstName: global.firstName,
+            profilePicture: global.profilePicture
+        });
+    }
+
+    refreshUserProfile = (profilePicture) => {
+        this.setState({ profilePicture });
     }
 
     render() {
         return (
             <Container>
                 <Content>
-                    <Image
-                        source={require('./../../assets/thumb-horizontal-logo.png')}
-                    />
-
                     <View>
                         <Text>
                             First Name: {this.state.firstName}
                         </Text>
                     </View>
 
-                    <View>
-                        <Text>
-                            Last Name: {this.state.lastName}
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            School: {this.state.school}
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            Username: @{this.state.username}
-                        </Text>
-                    </View>
-
-                    <View>
-                        <Text>
-                            Profile Picture: {this.state.profilePicture}
-                        </Text>
-                    </View>
+                    <TouchableOpacity onPress={() =>{
+                        this.props.navigation.navigate('EditProfile', {
+                            refresh: this.refreshUserProfile
+                        })
+                    }}>
+                        <Image
+                            source={ this.state.profilePicture || require('./../../assets/thumb-horizontal-logo.png') }
+                        />
+                    </TouchableOpacity>
 
                     <View>
                         <Text>
@@ -107,19 +55,12 @@ export default class Profile extends Component {
                     <Button rounded info style={{ alignSelf: 'center' }}
                         onPress={() =>{
                             this.props.navigation.navigate('EditProfile', {
-                                user: {
-                                    firstName: this.state.firstName,
-                                    lastName: this.state.lastName,
-                                    username: this.state.username,
-                                    school: this.state.school,
-                                    profilePicture: this.state.profilePicture
-                                },
                                 refresh: this.refreshUserProfile
                             })
                         }}
                     >
                         <Text>
-                            Edit Profile
+                            View and Edit Profile
                         </Text>
                     </Button>
 
