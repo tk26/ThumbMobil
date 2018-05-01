@@ -64,7 +64,19 @@ export default class EditProfile extends Component {
                 this.setState({
                     error: response.message
                 })
-                this.props.navigation.state.params.refresh(this.state.profilePicture);
+                // update global
+                global.profilePicture = this.state.profilePicture;
+                AsyncStorage.getItem("user")
+                    .then(user => {
+                        user = JSON.parse(user);
+                        user.bio = this.state.bio;
+                        user.profilePicture = this.state.profilePicture;
+                        // update local store
+                        AsyncStorage.setItem("user", JSON.stringify(user));
+                    })
+                    .then(() => {
+                        this.props.navigation.state.params.refresh(this.state.profilePicture);
+                    });
             }
             else {
                 this.setState({
